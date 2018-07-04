@@ -5,6 +5,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 * practrand, build a generator for use with `practrand`;
 * xoroshiro, and amongst others a modified version of `xoroshiro128plus` for lack of better ideas I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. Testing with practrand shows that this generator performs better than the original. It still fails, but less and later. Other news regarding this generator is that testing shows that `xoroshiro128plusshixo` is approximately 10% faster than `xoroshiro128plus`.
 * All code to verify the above claim is available in this repo.
+* This modification was found by me (while fiddling), I am not aware of prior art.
 
 
 ## Some test results
