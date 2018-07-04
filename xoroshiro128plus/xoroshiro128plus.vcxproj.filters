@@ -21,6 +21,15 @@
     <ClCompile Include="xoshiro256starstar.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xoroshiro128plus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xoroshiro128starstar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xoshiro256plus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xoroshiro.hpp">
