@@ -1,6 +1,4 @@
 
-#if 0
-
 // C99 Complementary Multiply With Carry generator
 
 #include <stdint.h>
@@ -68,7 +66,3 @@ int main ( )
 	initCMWC ( &cmwc, seed );
 	printf ( "Random CMWC: %u\n", randCMWC ( &cmwc ) );
 }
-
-#endif
-
-

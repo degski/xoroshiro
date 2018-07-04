@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9C7FEC8D-15E9-4EDD-BAA3-8F083191706C}</ProjectGuid>
@@ -109,7 +109,7 @@
       <DiagnosticsFormat />
       <PreprocessToFile>false</PreprocessToFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalOptions>-Xclang -fcxx-exceptions -Xclang -std=c++17 -Qunused-arguments -Xclang -pedantic -Xclang -Wno-microsoft-template -Xclang -ffast-math -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2 -Xclang -Wno-unused-variable %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Qunused-arguments -Xclang -pedantic -Xclang -Wno-microsoft-template -Xclang -ffast-math -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2 -Xclang -Wno-unused-variable %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,7 +144,7 @@
       <DiagnosticsFormat />
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <AdditionalOptions>-Xclang -fcxx-exceptions -Xclang -std=c++17 -Qunused-arguments -Xclang -pedantic -Xclang -Wno-microsoft-template -Xclang -ffast-math -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2 -Xclang -Wno-unused-variable %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Qunused-arguments -Xclang -pedantic -Xclang -Wno-microsoft-template -Xclang -ffast-math -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2 -Xclang -Wno-unused-variable %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
