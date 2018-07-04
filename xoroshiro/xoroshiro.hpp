@@ -34,223 +34,223 @@ namespace random {
 
 #if !defined(BOOST_NO_INT64_T) && !defined(BOOST_NO_INTEGRAL_INT64_T)
 
-	namespace detail {
+    namespace detail {
 
-		inline std::uint64_t xoroshiro_integer_hash ( std::uint64_t x );
-	}
+        inline std::uint64_t xoroshiro_integer_hash ( std::uint64_t x );
+    }
 
-	/**
-	* This is a fixed-increment version of Java 8's SplittableRandom generator
-	* See http://dx.doi.org/10.1145/2714064.2660195 and
-	* http://docs.oracle.com/javase/8/docs/api/java/util/SplittableRandom.html
-	*
-	* It is a very fast generator passing BigCrush, and it can be useful if
-	* for some reason one absolutely want 64 bits of state;
-	*
-	* c-code by Sebastiano Vigna: http://xoroshiro.di.unimi.it/splitmix64.c
-	*/
-	class splitmix64 {
-		friend class xoroshiro128plus;
-		friend class xoroshiro128plusshixo;
-		friend class xoroshiro128plusshixostar;
-		friend class xoroshiro128plusshixostarshixo;
-		friend class xorshift128plus;
-		friend class xorshift1024star;
-	public:
-		typedef std::uint64_t result_type;
+    /**
+    * This is a fixed-increment version of Java 8's SplittableRandom generator
+    * See http://dx.doi.org/10.1145/2714064.2660195 and
+    * http://docs.oracle.com/javase/8/docs/api/java/util/SplittableRandom.html
+    *
+    * It is a very fast generator passing BigCrush, and it can be useful if
+    * for some reason one absolutely want 64 bits of state;
+    *
+    * c-code by Sebastiano Vigna: http://xoroshiro.di.unimi.it/splitmix64.c
+    */
+    class splitmix64 {
+        friend class xoroshiro128plus;
+        friend class xoroshiro128plusshixo;
+        friend class xoroshiro128plusshixostar;
+        friend class xoroshiro128plusshixostarshixo;
+        friend class xorshift128plus;
+        friend class xorshift1024star;
+    public:
+        typedef std::uint64_t result_type;
 
-		// Required for old Boost.Random concept.
-		static const bool has_fixed_range = true;
-		static const std::uint64_t default_seed = std::uint64_t { 0x9E3779B97F4A7C15 };
+        // Required for old Boost.Random concept.
+        static const bool has_fixed_range = true;
+        static const std::uint64_t default_seed = std::uint64_t { 0x9E3779B97F4A7C15 };
 
-		/**
-		* Constructs a @c splitmix64, using the default seed.
-		*/
-		splitmix64 ( )
-		{
-			seed ( );
-		}
+        /**
+        * Constructs a @c splitmix64, using the default seed.
+        */
+        splitmix64 ( )
+        {
+            seed ( );
+        }
 
-		/**
-		* Constructs a @c splitmix64, seeding it with @c value.
-		*/
-		BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( splitmix64,
-			std::uint64_t, value )
-		{
-			seed ( value );
-		}
+        /**
+        * Constructs a @c splitmix64, seeding it with @c value.
+        */
+        BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( splitmix64,
+            std::uint64_t, value )
+        {
+            seed ( value );
+        }
 
-		/**
-		* Constructs a @c splitmix64, seeding it with values
-		* produced by a call to @c seq.generate().
-		*/
-		BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( splitmix64,
-			SeedSeq, seq )
-		{
-			seed ( seq );
-		}
+        /**
+        * Constructs a @c splitmix64, seeding it with values
+        * produced by a call to @c seq.generate().
+        */
+        BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( splitmix64,
+            SeedSeq, seq )
+        {
+            seed ( seq );
+        }
 
-		/**
-		* Constructs a @c splitmix64 and seeds it with values taken
-		* from the iterator range [first, last) and adjusts first to
-		* point to the element after the last one used. If there are
-		* not enough elements, throws @c std::invalid_argument.
-		*
-		* first and last must be input iterators.
-		*/
-		template<class It>
-		splitmix64 ( It& first, It last )
-		{
-			seed ( first, last );
-		}
+        /**
+        * Constructs a @c splitmix64 and seeds it with values taken
+        * from the iterator range [first, last) and adjusts first to
+        * point to the element after the last one used. If there are
+        * not enough elements, throws @c std::invalid_argument.
+        *
+        * first and last must be input iterators.
+        */
+        template<class It>
+        splitmix64 ( It& first, It last )
+        {
+            seed ( first, last );
+        }
 
-		// compiler-generated copy constructor and assignment operator are fine.
+        // compiler-generated copy constructor and assignment operator are fine.
 
-		/**
-		* Calls seed(default_seed).
-		*/
-		void seed ( )
-		{
-			seed ( default_seed );
-		}
+        /**
+        * Calls seed(default_seed).
+        */
+        void seed ( )
+        {
+            seed ( default_seed );
+        }
 
-		/**
-		* Seeds a @c splitmix64 using the supplied value. 'Hashes' @c value
-		* using the bijection described by:
-		*
-		* std::uint64_t integer_hash(std::uint64_t x) {
-		*
-		*     x = ((x >> 32) ^ x) * 0xDE17C195AA959A81;
-		*	   x = ((x >> 32) ^ x) * 0xDE17C195AA959A81;
-		*     x = ((x >> 32) ^ x);
-		*
-		*	   return x;
-		* }
-		*/
-		BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( splitmix64, std::uint64_t, value )
-		{
-			_s [ 0 ] = detail::xoroshiro_integer_hash ( value );
-		}
+        /**
+        * Seeds a @c splitmix64 using the supplied value. 'Hashes' @c value
+        * using the bijection described by:
+        *
+        * std::uint64_t integer_hash(std::uint64_t x) {
+        *
+        *     x = ((x >> 32) ^ x) * 0xDE17C195AA959A81;
+        *	   x = ((x >> 32) ^ x) * 0xDE17C195AA959A81;
+        *     x = ((x >> 32) ^ x);
+        *
+        *	   return x;
+        * }
+        */
+        BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( splitmix64, std::uint64_t, value )
+        {
+            _s [ 0 ] = detail::xoroshiro_integer_hash ( value );
+        }
 
-		/**
-		* Seeds a @c splitmix64 using values from a SeedSeq.
-		*/
-		BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( splitmix64, SeedSeq, seq )
-		{
-			detail::seed_array_int<64, 1, SeedSeq, std::uint64_t> ( seq, _s );
-		}
+        /**
+        * Seeds a @c splitmix64 using values from a SeedSeq.
+        */
+        BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( splitmix64, SeedSeq, seq )
+        {
+            detail::seed_array_int<64, 1, SeedSeq, std::uint64_t> ( seq, _s );
+        }
 
-		/**
-		* seeds a @c splitmix64 with values taken from the iterator
-		* range [first, last) and adjusts @c first to point to the
-		* element after the last one used.  If there are not enough
-		* elements, throws @c std::invalid_argument.
-		*
-		* @c first and @c last must be input iterators.
-		*/
-		template<class It>
-		void seed ( It& first, It last )
-		{
-			detail::fill_array_int<64, 1, It, std::uint64_t> ( first, last, _s );
-		}
+        /**
+        * seeds a @c splitmix64 with values taken from the iterator
+        * range [first, last) and adjusts @c first to point to the
+        * element after the last one used.  If there are not enough
+        * elements, throws @c std::invalid_argument.
+        *
+        * @c first and @c last must be input iterators.
+        */
+        template<class It>
+        void seed ( It& first, It last )
+        {
+            detail::fill_array_int<64, 1, It, std::uint64_t> ( first, last, _s );
+        }
 
-		/**
-		* Returns the smallest value that the @c splitmix64
-		* can produce.
-		*/
-		static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-		{
-			return 0;
-		}
+        /**
+        * Returns the smallest value that the @c splitmix64
+        * can produce.
+        */
+        static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+        {
+            return 0;
+        }
 
-		/**
-		* Returns the largest value that the @c splitmix64
-		* can produce.
-		*/
-		static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-		{
-			return UINT64_MAX;
-		}
+        /**
+        * Returns the largest value that the @c splitmix64
+        * can produce.
+        */
+        static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+        {
+            return UINT64_MAX;
+        }
 
-		/** Returns the next value of the @c splitmix64. */
-		std::uint64_t operator()( )
-		{
-			return hash ( next ( ) );
-		}
+        /** Returns the next value of the @c splitmix64. */
+        std::uint64_t operator()( )
+        {
+            return hash ( next ( ) );
+        }
 
-		/** Fills a range with random values. */
-		template<class Iter>
-		void generate ( Iter first, Iter last )
-		{
-			detail::generate_from_int ( *this, first, last );
-		}
+        /** Fills a range with random values. */
+        template<class Iter>
+        void generate ( Iter first, Iter last )
+        {
+            detail::generate_from_int ( *this, first, last );
+        }
 
-		/** Advances the state of the generator by @c z. */
-		void discard ( boost::uintmax_t z )
-		{
-			// This seems to be the fastest way (release),
-			// as opposed to anything more fancy.
-			while ( z-- ) {
-				next ( );
-			}
-		}
+        /** Advances the state of the generator by @c z. */
+        void discard ( boost::uintmax_t z )
+        {
+            // This seems to be the fastest way (release),
+            // as opposed to anything more fancy.
+            while ( z-- ) {
+                next ( );
+            }
+        }
 
-		friend bool operator==( const splitmix64& x,
-			const splitmix64& y )
-		{
-			return x._s [ 0 ] == y._s [ 0 ];
-		}
+        friend bool operator==( const splitmix64& x,
+            const splitmix64& y )
+        {
+            return x._s [ 0 ] == y._s [ 0 ];
+        }
 
-		friend bool operator!=( const splitmix64& x,
-			const splitmix64& y )
-		{
-			return !( x == y );
-		}
+        friend bool operator!=( const splitmix64& x,
+            const splitmix64& y )
+        {
+            return !( x == y );
+        }
 
-		/** Writes a @c splitmix64 to a @c std::ostream. */
-		template<class CharT, class Traits>
-		friend std::basic_ostream<CharT, Traits>&
-			operator<<( std::basic_ostream<CharT, Traits>& os,
-				const splitmix64& sm64 )
-		{
-			os << sm64._s [ 0 ];
-			return os;
-		}
+        /** Writes a @c splitmix64 to a @c std::ostream. */
+        template<class CharT, class Traits>
+        friend std::basic_ostream<CharT, Traits>&
+            operator<<( std::basic_ostream<CharT, Traits>& os,
+                const splitmix64& sm64 )
+        {
+            os << sm64._s [ 0 ];
+            return os;
+        }
 
-		/** Reads a @c splitmix64 from a @c std::istream. */
-		template<class CharT, class Traits>
-		friend std::basic_istream<CharT, Traits>&
-			operator >> ( std::basic_istream<CharT, Traits>& is,
-				splitmix64& sm64 )
-		{
-			is >> sm64._s [ 0 ];
-			return is;
-		}
+        /** Reads a @c splitmix64 from a @c std::istream. */
+        template<class CharT, class Traits>
+        friend std::basic_istream<CharT, Traits>&
+            operator >> ( std::basic_istream<CharT, Traits>& is,
+                splitmix64& sm64 )
+        {
+            is >> sm64._s [ 0 ];
+            return is;
+        }
 
-	private:
+    private:
 
-		/// \cond show_private
+        /// \cond show_private
 
-		inline std::uint64_t next ( )
-		{
-			return ( _s [ 0 ] += std::uint64_t { 0x9E3779B97F4A7C15 } );
-		}
+        inline std::uint64_t next ( )
+        {
+            return ( _s [ 0 ] += std::uint64_t { 0x9E3779B97F4A7C15 } );
+        }
 
-		static inline std::uint64_t hash ( std::uint64_t z )
-		{
-			z = ( z ^ ( z >> 30 ) ) * std::uint64_t { 0xBF58476D1CE4E5B9 };
-			z = ( z ^ ( z >> 27 ) ) * std::uint64_t { 0x94D049BB133111EB };
-			return z ^ ( z >> 31 );
-		}
+        static inline std::uint64_t hash ( std::uint64_t z )
+        {
+            z = ( z ^ ( z >> 30 ) ) * std::uint64_t { 0xBF58476D1CE4E5B9 };
+            z = ( z ^ ( z >> 27 ) ) * std::uint64_t { 0x94D049BB133111EB };
+            return z ^ ( z >> 31 );
+        }
 
-		/// \endcond
+        /// \endcond
 
-		std::uint64_t _s [ 1 ];
-	};
+        std::uint64_t _s [ 1 ];
+    };
 
 namespace detail {
 
-	// const std::uint64_t v = 0x1AEC805299990163, y = 0xCDFB859A3DD0884B;
+    // const std::uint64_t v = 0x1AEC805299990163, y = 0xCDFB859A3DD0884B;
 
     inline std::uint64_t xoroshiro_integer_hash(std::uint64_t x)
     {
@@ -295,7 +295,7 @@ namespace detail {
         }
 
         boost::random::splitmix64 gen(seed);
-		std::generate(std::begin(x), std::end(x), gen);
+        std::generate(std::begin(x), std::end(x), gen);
     }
 
     template<class It, std::size_t n>
@@ -326,7 +326,7 @@ namespace detail {
 
         // Fix zeros.
         boost::random::splitmix64 gen;
-		std::generate(std::begin(x), std::end(x), gen);
+        std::generate(std::begin(x), std::end(x), gen);
     }
 
 } // namespace detail
@@ -423,9 +423,9 @@ public:
      */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(xoroshiro128plus, SeedSeq, seq)
     {
-		detail::seed_array_non_zero_int(seq, _s);
-		warmup();
-	}
+        detail::seed_array_non_zero_int(seq, _s);
+        warmup();
+    }
 
     /**
      * Seeds a @c xoroshiro128plus with values taken from the
@@ -550,10 +550,10 @@ private:
         _s[1] = rotl(_s[1], 36);
     }
 
-	// As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
     inline void warmup()
     {
-		discard(8);
+        discard(8);
     }
 
     /// \endcond
@@ -564,699 +564,699 @@ private:
 class xoroshiro128plusshixo
 {
 public:
-	typedef std::uint64_t result_type;
+    typedef std::uint64_t result_type;
 
-	// Required for old Boost.Random concept.
-	static const bool has_fixed_range = true;
-	static const std::uint64_t default_seed = 1;
+    // Required for old Boost.Random concept.
+    static const bool has_fixed_range = true;
+    static const std::uint64_t default_seed = 1;
 
-	/**
-	* Constructs a @c xoroshiro128plusshixo, using the default seed.
-	*/
-	xoroshiro128plusshixo ( )
-	{
-		seed ( );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixo, using the default seed.
+    */
+    xoroshiro128plusshixo ( )
+    {
+        seed ( );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixo, seeding it with @c value.
-	*/
-	BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( xoroshiro128plusshixo,
-		std::uint64_t, value )
-	{
-		seed ( value );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixo, seeding it with @c value.
+    */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( xoroshiro128plusshixo,
+        std::uint64_t, value )
+    {
+        seed ( value );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixo, seeding it with values
-	* produced by a call to @c seq.generate().
-	*/
-	BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( xoroshiro128plusshixo,
-		SeedSeq, seq )
-	{
-		seed ( seq );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixo, seeding it with values
+    * produced by a call to @c seq.generate().
+    */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( xoroshiro128plusshixo,
+        SeedSeq, seq )
+    {
+        seed ( seq );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixo and seeds it with values
-	* taken from the iterator range [first, last) and adjusts
-	* first to point to the element after the last one used.
-	* If there are not enough elements, throws @c std::invalid_argument.
-	*
-	* first and last must be input iterators.
-	*/
-	template<class It>
-	xoroshiro128plusshixo ( It& first, It last )
-	{
-		seed ( first, last );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixo and seeds it with values
+    * taken from the iterator range [first, last) and adjusts
+    * first to point to the element after the last one used.
+    * If there are not enough elements, throws @c std::invalid_argument.
+    *
+    * first and last must be input iterators.
+    */
+    template<class It>
+    xoroshiro128plusshixo ( It& first, It last )
+    {
+        seed ( first, last );
+    }
 
-	// compiler-generated copy constructor and assignment operator are fine.
+    // compiler-generated copy constructor and assignment operator are fine.
 
-	/**
-	* Calls seed(default_seed)
-	*/
-	void seed ( )
-	{
-		seed ( default_seed );
-	}
+    /**
+    * Calls seed(default_seed)
+    */
+    void seed ( )
+    {
+        seed ( default_seed );
+    }
 
-	/**
-	* seeds a @c xoroshiro128plusshixo with splitmix64, as per Sebastiano
-	* Vigna's recommendation.
-	*/
-	BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixo, std::uint64_t, value )
-	{
-		std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-		_s [ 0 ] = splitmix64::hash ( s );
-		_s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
-	}
+    /**
+    * seeds a @c xoroshiro128plusshixo with splitmix64, as per Sebastiano
+    * Vigna's recommendation.
+    */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixo, std::uint64_t, value )
+    {
+        std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
+        _s [ 0 ] = splitmix64::hash ( s );
+        _s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
+    }
 
-	/**
-	* Seeds a @c xoroshiro128plusshixo using values from a SeedSeq. If a
-	* valid seed cannot be generated throws @c std::runtime_error.
-	*/
-	BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( xoroshiro128plusshixo, SeedSeq, seq )
-	{
-		detail::seed_array_non_zero_int ( seq, _s );
-		warmup ( );
-	}
+    /**
+    * Seeds a @c xoroshiro128plusshixo using values from a SeedSeq. If a
+    * valid seed cannot be generated throws @c std::runtime_error.
+    */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( xoroshiro128plusshixo, SeedSeq, seq )
+    {
+        detail::seed_array_non_zero_int ( seq, _s );
+        warmup ( );
+    }
 
-	/**
-	* Seeds a @c xoroshiro128plusshixo with values taken from the
-	* iterator range [first, last) and adjusts @c first to
-	* point to the element after the last one used. If there are
-	* not enough elements or all the whole input range is zero,
-	* throws @c std::invalid_argument.
-	*
-	* @c first and @c last must be input iterators.
-	*/
-	template<class It>
-	void seed ( It& first, It last )
-	{
-		detail::fill_array_non_zero_int ( first, last, _s );
-		warmup ( );
-	}
+    /**
+    * Seeds a @c xoroshiro128plusshixo with values taken from the
+    * iterator range [first, last) and adjusts @c first to
+    * point to the element after the last one used. If there are
+    * not enough elements or all the whole input range is zero,
+    * throws @c std::invalid_argument.
+    *
+    * @c first and @c last must be input iterators.
+    */
+    template<class It>
+    void seed ( It& first, It last )
+    {
+        detail::fill_array_non_zero_int ( first, last, _s );
+        warmup ( );
+    }
 
-	/**
-	* Returns the smallest value that the @c xoroshiro128plusshixo
-	* can produce.
-	*/
-	static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-	{
-		return 0;
-	}
+    /**
+    * Returns the smallest value that the @c xoroshiro128plusshixo
+    * can produce.
+    */
+    static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+    {
+        return 0;
+    }
 
-	/**
-	* Returns the largest value that the @c xoroshiro128plusshixo
-	* can produce.
-	*/
-	static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-	{
-		return UINT64_MAX;
-	}
+    /**
+    * Returns the largest value that the @c xoroshiro128plusshixo
+    * can produce.
+    */
+    static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+    {
+        return UINT64_MAX;
+    }
 
-	/** Returns the next value of the @c xoroshiro128plusshixo. */
-	std::uint64_t operator()( )
-	{
-		std::uint64_t r = _s [ 0 ] + _s [ 1 ];
-		next ( );
-		return ( r >> 32 ) ^ r;
-	}
+    /** Returns the next value of the @c xoroshiro128plusshixo. */
+    std::uint64_t operator()( )
+    {
+        std::uint64_t r = _s [ 0 ] + _s [ 1 ];
+        next ( );
+        return ( r >> 32 ) ^ r;
+    }
 
-	/** Fills a range with random values. */
-	template<class Iter>
-	void generate ( Iter first, Iter last ) {
+    /** Fills a range with random values. */
+    template<class Iter>
+    void generate ( Iter first, Iter last ) {
 
-		detail::generate_from_int ( *this, first, last );
+        detail::generate_from_int ( *this, first, last );
 
-		/*
+        /*
 
-		while ( first != last ) {
+        while ( first != last ) {
 
-			std::uint64_t tmp = _s [ 0 ] + _s [ 1 ];
-			tmp ^= tmp >> 32;
+            std::uint64_t tmp = _s [ 0 ] + _s [ 1 ];
+            tmp ^= tmp >> 32;
 
-			next ( );
+            next ( );
 
-			*first = tmp;
-			++first;
-		}
+            *first = tmp;
+            ++first;
+        }
 
-		*/
-	}
+        */
+    }
 
-	/** Advances the state of the generator by @c z. */
-	void discard ( std::uintmax_t z )
-	{
-		while ( z-- ) {
-			next ( );
-		}
-	}
+    /** Advances the state of the generator by @c z. */
+    void discard ( std::uintmax_t z )
+    {
+        while ( z-- ) {
+            next ( );
+        }
+    }
 
-	/**
-	* This is a jump function for the generator. It is equivalent
-	* to calling @c discard(2^64) @c z times; it can be used to
-	* generate 2^64 non-overlapping subsequences for parallel
-	* computations.
-	*/
-	void jump ( std::uintmax_t z = 1 )
-	{
-		while ( z-- ) {
-			std::uint64_t s0 = 0, s1 = 0;
-			for ( std::size_t b = 0; b < 64; ++b ) {
-				if ( std::uint64_t { 0xBEAC0467EBA5FACB } &std::uint64_t { 1 } << b ) {
-					s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
-				}
-				next ( );
-			}
-			for ( std::size_t b = 0; b < 64; ++b ) {
-				if ( std::uint64_t { 0xD86B048B86AA9922 } &std::uint64_t { 1 } << b ) {
-					s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
-				}
-				next ( );
-			}
-			_s [ 0 ] = s0, _s [ 1 ] = s1;
-		}
-	}
+    /**
+    * This is a jump function for the generator. It is equivalent
+    * to calling @c discard(2^64) @c z times; it can be used to
+    * generate 2^64 non-overlapping subsequences for parallel
+    * computations.
+    */
+    void jump ( std::uintmax_t z = 1 )
+    {
+        while ( z-- ) {
+            std::uint64_t s0 = 0, s1 = 0;
+            for ( std::size_t b = 0; b < 64; ++b ) {
+                if ( std::uint64_t { 0xBEAC0467EBA5FACB } &std::uint64_t { 1 } << b ) {
+                    s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
+                }
+                next ( );
+            }
+            for ( std::size_t b = 0; b < 64; ++b ) {
+                if ( std::uint64_t { 0xD86B048B86AA9922 } &std::uint64_t { 1 } << b ) {
+                    s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
+                }
+                next ( );
+            }
+            _s [ 0 ] = s0, _s [ 1 ] = s1;
+        }
+    }
 
-	friend bool operator==( const xoroshiro128plusshixo& x,
-		const xoroshiro128plusshixo& y )
-	{
-		return x._s [ 0 ] == y._s [ 0 ] && x._s [ 1 ] == y._s [ 1 ];
-	}
+    friend bool operator==( const xoroshiro128plusshixo& x,
+        const xoroshiro128plusshixo& y )
+    {
+        return x._s [ 0 ] == y._s [ 0 ] && x._s [ 1 ] == y._s [ 1 ];
+    }
 
-	friend bool operator!=( const xoroshiro128plusshixo& x,
-		const xoroshiro128plusshixo& y )
-	{
-		return !( x == y );
-	}
+    friend bool operator!=( const xoroshiro128plusshixo& x,
+        const xoroshiro128plusshixo& y )
+    {
+        return !( x == y );
+    }
 
-	/** Writes a @c xoroshiro128plusshixo to a @c std::ostream. */
-	template<class CharT, class Traits>
-	friend std::basic_ostream<CharT, Traits>&
-		operator<<( std::basic_ostream<CharT, Traits>& os,
-			const xoroshiro128plusshixo& xoro )
-	{
-		os << xoro._s [ 0 ] << ' ' << xoro._s [ 1 ];
-		return os;
-	}
+    /** Writes a @c xoroshiro128plusshixo to a @c std::ostream. */
+    template<class CharT, class Traits>
+    friend std::basic_ostream<CharT, Traits>&
+        operator<<( std::basic_ostream<CharT, Traits>& os,
+            const xoroshiro128plusshixo& xoro )
+    {
+        os << xoro._s [ 0 ] << ' ' << xoro._s [ 1 ];
+        return os;
+    }
 
-	/** Reads a @c xoroshiro128plusshixo from a @c std::istream. */
-	template<class CharT, class Traits>
-	friend std::basic_istream<CharT, Traits>&
-		operator>>( std::basic_istream<CharT, Traits>& is,
-			xoroshiro128plusshixo& xoro )
-	{
-		is >> xoro._s [ 0 ] >> std::ws >> xoro._s [ 1 ];
-		return is;
-	}
+    /** Reads a @c xoroshiro128plusshixo from a @c std::istream. */
+    template<class CharT, class Traits>
+    friend std::basic_istream<CharT, Traits>&
+        operator>>( std::basic_istream<CharT, Traits>& is,
+            xoroshiro128plusshixo& xoro )
+    {
+        is >> xoro._s [ 0 ] >> std::ws >> xoro._s [ 1 ];
+        return is;
+    }
 
 private:
 
-	/// \cond show_private
+    /// \cond show_private
 
-	// Rotate left, use of intrinsic shows no speed-up. */
-	static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
-	{
-		return ( x << k ) | ( x >> ( 64 - k ) );
-	}
+    // Rotate left, use of intrinsic shows no speed-up. */
+    static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
+    {
+        return ( x << k ) | ( x >> ( 64 - k ) );
+    }
 
-	/** Advance the state by 1 step. */
-	inline void next ( )
-	{
-		_s [ 1 ] ^= _s [ 0 ];
-		_s [ 0 ] = rotl ( _s [ 0 ], 55 );
-		_s [ 0 ] ^= _s [ 1 ];
-		_s [ 0 ] ^= _s [ 1 ] << 14;
-		_s [ 1 ] = rotl ( _s [ 1 ], 36 );
-	}
+    /** Advance the state by 1 step. */
+    inline void next ( )
+    {
+        _s [ 1 ] ^= _s [ 0 ];
+        _s [ 0 ] = rotl ( _s [ 0 ], 55 );
+        _s [ 0 ] ^= _s [ 1 ];
+        _s [ 0 ] ^= _s [ 1 ] << 14;
+        _s [ 1 ] = rotl ( _s [ 1 ], 36 );
+    }
 
-	// As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-	inline void warmup ( )
-	{
-		discard ( 8 );
-	}
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    inline void warmup ( )
+    {
+        discard ( 8 );
+    }
 
-	/// \endcond
+    /// \endcond
 
-	std::uint64_t _s [ 2 ];
+    std::uint64_t _s [ 2 ];
 };
 
 class xoroshiro128plusshixostar
 {
 public:
-	typedef std::uint64_t result_type;
+    typedef std::uint64_t result_type;
 
-	// Required for old Boost.Random concept.
-	static const bool has_fixed_range = true;
-	static const std::uint64_t default_seed = 1;
+    // Required for old Boost.Random concept.
+    static const bool has_fixed_range = true;
+    static const std::uint64_t default_seed = 1;
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostar, using the default seed.
-	*/
-	xoroshiro128plusshixostar ( )
-	{
-		seed ( );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostar, using the default seed.
+    */
+    xoroshiro128plusshixostar ( )
+    {
+        seed ( );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostar, seeding it with @c value.
-	*/
-	BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( xoroshiro128plusshixostar,
-		std::uint64_t, value )
-	{
-		seed ( value );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostar, seeding it with @c value.
+    */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( xoroshiro128plusshixostar,
+        std::uint64_t, value )
+    {
+        seed ( value );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostar, seeding it with values
-	* produced by a call to @c seq.generate().
-	*/
-	BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( xoroshiro128plusshixostar,
-		SeedSeq, seq )
-	{
-		seed ( seq );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostar, seeding it with values
+    * produced by a call to @c seq.generate().
+    */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( xoroshiro128plusshixostar,
+        SeedSeq, seq )
+    {
+        seed ( seq );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostar and seeds it with values
-	* taken from the iterator range [first, last) and adjusts
-	* first to point to the element after the last one used.
-	* If there are not enough elements, throws @c std::invalid_argument.
-	*
-	* first and last must be input iterators.
-	*/
-	template<class It>
-	xoroshiro128plusshixostar ( It& first, It last )
-	{
-		seed ( first, last );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostar and seeds it with values
+    * taken from the iterator range [first, last) and adjusts
+    * first to point to the element after the last one used.
+    * If there are not enough elements, throws @c std::invalid_argument.
+    *
+    * first and last must be input iterators.
+    */
+    template<class It>
+    xoroshiro128plusshixostar ( It& first, It last )
+    {
+        seed ( first, last );
+    }
 
-	// compiler-generated copy constructor and assignment operator are fine.
+    // compiler-generated copy constructor and assignment operator are fine.
 
-	/**
-	* Calls seed(default_seed)
-	*/
-	void seed ( )
-	{
-		seed ( default_seed );
-	}
+    /**
+    * Calls seed(default_seed)
+    */
+    void seed ( )
+    {
+        seed ( default_seed );
+    }
 
-	/**
-	* seeds a @c xoroshiro128plusshixostar with splitmix64, as per Sebastiano
-	* Vigna's recommendation.
-	*/
-	BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixostar, std::uint64_t, value )
-	{
-		std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-		_s [ 0 ] = splitmix64::hash ( s );
-		_s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
-	}
+    /**
+    * seeds a @c xoroshiro128plusshixostar with splitmix64, as per Sebastiano
+    * Vigna's recommendation.
+    */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixostar, std::uint64_t, value )
+    {
+        std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
+        _s [ 0 ] = splitmix64::hash ( s );
+        _s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
+    }
 
-	/**
-	* Seeds a @c xoroshiro128plusshixostar using values from a SeedSeq. If a
-	* valid seed cannot be generated throws @c std::runtime_error.
-	*/
-	BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( xoroshiro128plusshixostar, SeedSeq, seq )
-	{
-		detail::seed_array_non_zero_int ( seq, _s );
-		warmup ( );
-	}
+    /**
+    * Seeds a @c xoroshiro128plusshixostar using values from a SeedSeq. If a
+    * valid seed cannot be generated throws @c std::runtime_error.
+    */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( xoroshiro128plusshixostar, SeedSeq, seq )
+    {
+        detail::seed_array_non_zero_int ( seq, _s );
+        warmup ( );
+    }
 
-	/**
-	* Seeds a @c xoroshiro128plusshixostar with values taken from the
-	* iterator range [first, last) and adjusts @c first to
-	* point to the element after the last one used. If there are
-	* not enough elements or all the whole input range is zero,
-	* throws @c std::invalid_argument.
-	*
-	* @c first and @c last must be input iterators.
-	*/
-	template<class It>
-	void seed ( It& first, It last )
-	{
-		detail::fill_array_non_zero_int ( first, last, _s );
-		warmup ( );
-	}
+    /**
+    * Seeds a @c xoroshiro128plusshixostar with values taken from the
+    * iterator range [first, last) and adjusts @c first to
+    * point to the element after the last one used. If there are
+    * not enough elements or all the whole input range is zero,
+    * throws @c std::invalid_argument.
+    *
+    * @c first and @c last must be input iterators.
+    */
+    template<class It>
+    void seed ( It& first, It last )
+    {
+        detail::fill_array_non_zero_int ( first, last, _s );
+        warmup ( );
+    }
 
-	/**
-	* Returns the smallest value that the @c xoroshiro128plusshixostar
-	* can produce.
-	*/
-	static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-	{
-		return 0;
-	}
+    /**
+    * Returns the smallest value that the @c xoroshiro128plusshixostar
+    * can produce.
+    */
+    static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+    {
+        return 0;
+    }
 
-	/**
-	* Returns the largest value that the @c xoroshiro128plusshixostar
-	* can produce.
-	*/
-	static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-	{
-		return UINT64_MAX;
-	}
+    /**
+    * Returns the largest value that the @c xoroshiro128plusshixostar
+    * can produce.
+    */
+    static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+    {
+        return UINT64_MAX;
+    }
 
-	/** Returns the next value of the @c xoroshiro128plusshixostar. */
-	std::uint64_t operator()( )
-	{
-		std::uint64_t r = _s [ 0 ] + _s [ 1 ];
-		next ( );
-		return ((r >> 32) ^ r) * std::uint64_t { 0x1AEC805299990163 };
-	}
+    /** Returns the next value of the @c xoroshiro128plusshixostar. */
+    std::uint64_t operator()( )
+    {
+        std::uint64_t r = _s [ 0 ] + _s [ 1 ];
+        next ( );
+        return ((r >> 32) ^ r) * std::uint64_t { 0x1AEC805299990163 };
+    }
 
-	/** Fills a range with random values. */
-	template<class Iter>
-	void generate ( Iter first, Iter last )
-	{
-		detail::generate_from_int ( *this, first, last );
-	}
+    /** Fills a range with random values. */
+    template<class Iter>
+    void generate ( Iter first, Iter last )
+    {
+        detail::generate_from_int ( *this, first, last );
+    }
 
-	/** Advances the state of the generator by @c z. */
-	void discard ( std::uintmax_t z )
-	{
-		while ( z-- ) {
-			next ( );
-		}
-	}
+    /** Advances the state of the generator by @c z. */
+    void discard ( std::uintmax_t z )
+    {
+        while ( z-- ) {
+            next ( );
+        }
+    }
 
-	/**
-	* This is a jump function for the generator. It is equivalent
-	* to calling @c discard(2^64) @c z times; it can be used to
-	* generate 2^64 non-overlapping subsequences for parallel
-	* computations.
-	*/
-	void jump ( std::uintmax_t z = 1 )
-	{
-		while ( z-- ) {
-			std::uint64_t s0 = 0, s1 = 0;
-			for ( std::size_t b = 0; b < 64; ++b ) {
-				if ( std::uint64_t { 0xBEAC0467EBA5FACB } &std::uint64_t { 1 } << b ) {
-					s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
-				}
-				next ( );
-			}
-			for ( std::size_t b = 0; b < 64; ++b ) {
-				if ( std::uint64_t { 0xD86B048B86AA9922 } &std::uint64_t { 1 } << b ) {
-					s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
-				}
-				next ( );
-			}
-			_s [ 0 ] = s0, _s [ 1 ] = s1;
-		}
-	}
+    /**
+    * This is a jump function for the generator. It is equivalent
+    * to calling @c discard(2^64) @c z times; it can be used to
+    * generate 2^64 non-overlapping subsequences for parallel
+    * computations.
+    */
+    void jump ( std::uintmax_t z = 1 )
+    {
+        while ( z-- ) {
+            std::uint64_t s0 = 0, s1 = 0;
+            for ( std::size_t b = 0; b < 64; ++b ) {
+                if ( std::uint64_t { 0xBEAC0467EBA5FACB } &std::uint64_t { 1 } << b ) {
+                    s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
+                }
+                next ( );
+            }
+            for ( std::size_t b = 0; b < 64; ++b ) {
+                if ( std::uint64_t { 0xD86B048B86AA9922 } &std::uint64_t { 1 } << b ) {
+                    s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
+                }
+                next ( );
+            }
+            _s [ 0 ] = s0, _s [ 1 ] = s1;
+        }
+    }
 
-	friend bool operator==( const xoroshiro128plusshixostar& x,
-		const xoroshiro128plusshixostar& y )
-	{
-		return x._s [ 0 ] == y._s [ 0 ] && x._s [ 1 ] == y._s [ 1 ];
-	}
+    friend bool operator==( const xoroshiro128plusshixostar& x,
+        const xoroshiro128plusshixostar& y )
+    {
+        return x._s [ 0 ] == y._s [ 0 ] && x._s [ 1 ] == y._s [ 1 ];
+    }
 
-	friend bool operator!=( const xoroshiro128plusshixostar& x,
-		const xoroshiro128plusshixostar& y )
-	{
-		return !( x == y );
-	}
+    friend bool operator!=( const xoroshiro128plusshixostar& x,
+        const xoroshiro128plusshixostar& y )
+    {
+        return !( x == y );
+    }
 
-	/** Writes a @c xoroshiro128plusshixostar to a @c std::ostream. */
-	template<class CharT, class Traits>
-	friend std::basic_ostream<CharT, Traits>&
-		operator<<( std::basic_ostream<CharT, Traits>& os,
-			const xoroshiro128plusshixostar& xoro )
-	{
-		os << xoro._s [ 0 ] << ' ' << xoro._s [ 1 ];
-		return os;
-	}
+    /** Writes a @c xoroshiro128plusshixostar to a @c std::ostream. */
+    template<class CharT, class Traits>
+    friend std::basic_ostream<CharT, Traits>&
+        operator<<( std::basic_ostream<CharT, Traits>& os,
+            const xoroshiro128plusshixostar& xoro )
+    {
+        os << xoro._s [ 0 ] << ' ' << xoro._s [ 1 ];
+        return os;
+    }
 
-	/** Reads a @c xoroshiro128plusshixostar from a @c std::istream. */
-	template<class CharT, class Traits>
-	friend std::basic_istream<CharT, Traits>&
-		operator>>( std::basic_istream<CharT, Traits>& is,
-			xoroshiro128plusshixostar& xoro )
-	{
-		is >> xoro._s [ 0 ] >> std::ws >> xoro._s [ 1 ];
-		return is;
-	}
+    /** Reads a @c xoroshiro128plusshixostar from a @c std::istream. */
+    template<class CharT, class Traits>
+    friend std::basic_istream<CharT, Traits>&
+        operator>>( std::basic_istream<CharT, Traits>& is,
+            xoroshiro128plusshixostar& xoro )
+    {
+        is >> xoro._s [ 0 ] >> std::ws >> xoro._s [ 1 ];
+        return is;
+    }
 
 private:
 
-	/// \cond show_private
+    /// \cond show_private
 
-	// Rotate left, use of intrinsic shows no speed-up. */
-	static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
-	{
-		return ( x << k ) | ( x >> ( 64 - k ) );
-	}
+    // Rotate left, use of intrinsic shows no speed-up. */
+    static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
+    {
+        return ( x << k ) | ( x >> ( 64 - k ) );
+    }
 
-	/** Advance the state by 1 step. */
-	inline void next ( )
-	{
-		_s [ 1 ] ^= _s [ 0 ];
-		_s [ 0 ] = rotl ( _s [ 0 ], 55 );
-		_s [ 0 ] ^= _s [ 1 ];
-		_s [ 0 ] ^= _s [ 1 ] << 14;
-		_s [ 1 ] = rotl ( _s [ 1 ], 36 );
-	}
+    /** Advance the state by 1 step. */
+    inline void next ( )
+    {
+        _s [ 1 ] ^= _s [ 0 ];
+        _s [ 0 ] = rotl ( _s [ 0 ], 55 );
+        _s [ 0 ] ^= _s [ 1 ];
+        _s [ 0 ] ^= _s [ 1 ] << 14;
+        _s [ 1 ] = rotl ( _s [ 1 ], 36 );
+    }
 
-	// As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-	inline void warmup ( )
-	{
-		discard ( 8 );
-	}
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    inline void warmup ( )
+    {
+        discard ( 8 );
+    }
 
-	/// \endcond
+    /// \endcond
 
-	std::uint64_t _s [2];
+    std::uint64_t _s [2];
 };
 
 
 class xoroshiro128plusshixostarshixo
 {
 public:
-	typedef std::uint64_t result_type;
+    typedef std::uint64_t result_type;
 
-	// Required for old Boost.Random concept.
-	static const bool has_fixed_range = true;
-	static const std::uint64_t default_seed = 1;
+    // Required for old Boost.Random concept.
+    static const bool has_fixed_range = true;
+    static const std::uint64_t default_seed = 1;
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostarshixo, using the default seed.
-	*/
-	xoroshiro128plusshixostarshixo ( )
-	{
-		seed ( );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostarshixo, using the default seed.
+    */
+    xoroshiro128plusshixostarshixo ( )
+    {
+        seed ( );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostarshixo, seeding it with @c value.
-	*/
-	BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( xoroshiro128plusshixostarshixo,
-		std::uint64_t, value )
-	{
-		seed ( value );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostarshixo, seeding it with @c value.
+    */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR ( xoroshiro128plusshixostarshixo,
+        std::uint64_t, value )
+    {
+        seed ( value );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostarshixo, seeding it with values
-	* produced by a call to @c seq.generate().
-	*/
-	BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( xoroshiro128plusshixostarshixo,
-		SeedSeq, seq )
-	{
-		seed ( seq );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostarshixo, seeding it with values
+    * produced by a call to @c seq.generate().
+    */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR ( xoroshiro128plusshixostarshixo,
+        SeedSeq, seq )
+    {
+        seed ( seq );
+    }
 
-	/**
-	* Constructs a @c xoroshiro128plusshixostarshixo and seeds it with values
-	* taken from the iterator range [first, last) and adjusts
-	* first to point to the element after the last one used.
-	* If there are not enough elements, throws @c std::invalid_argument.
-	*
-	* first and last must be input iterators.
-	*/
-	template<class It>
-	xoroshiro128plusshixostarshixo ( It& first, It last )
-	{
-		seed ( first, last );
-	}
+    /**
+    * Constructs a @c xoroshiro128plusshixostarshixo and seeds it with values
+    * taken from the iterator range [first, last) and adjusts
+    * first to point to the element after the last one used.
+    * If there are not enough elements, throws @c std::invalid_argument.
+    *
+    * first and last must be input iterators.
+    */
+    template<class It>
+    xoroshiro128plusshixostarshixo ( It& first, It last )
+    {
+        seed ( first, last );
+    }
 
-	// compiler-generated copy constructor and assignment operator are fine.
+    // compiler-generated copy constructor and assignment operator are fine.
 
-	/**
-	* Calls seed(default_seed)
-	*/
-	void seed ( )
-	{
-		seed ( default_seed );
-	}
+    /**
+    * Calls seed(default_seed)
+    */
+    void seed ( )
+    {
+        seed ( default_seed );
+    }
 
-	/**
-	* seeds a @c xoroshiro128plusshixostarshixo with splitmix64, as per Sebastiano
-	* Vigna's recommendation.
-	*/
-	BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixostarshixo, std::uint64_t, value )
-	{
-		std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-		_s [ 0 ] = splitmix64::hash ( s );
-		_s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
-	}
+    /**
+    * seeds a @c xoroshiro128plusshixostarshixo with splitmix64, as per Sebastiano
+    * Vigna's recommendation.
+    */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixostarshixo, std::uint64_t, value )
+    {
+        std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
+        _s [ 0 ] = splitmix64::hash ( s );
+        _s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
+    }
 
-	/**
-	* Seeds a @c xoroshiro128plusshixostarshixo using values from a SeedSeq. If a
-	* valid seed cannot be generated throws @c std::runtime_error.
-	*/
-	BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( xoroshiro128plusshixostarshixo, SeedSeq, seq )
-	{
-		detail::seed_array_non_zero_int ( seq, _s );
-		warmup ( );
-	}
+    /**
+    * Seeds a @c xoroshiro128plusshixostarshixo using values from a SeedSeq. If a
+    * valid seed cannot be generated throws @c std::runtime_error.
+    */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED ( xoroshiro128plusshixostarshixo, SeedSeq, seq )
+    {
+        detail::seed_array_non_zero_int ( seq, _s );
+        warmup ( );
+    }
 
-	/**
-	* Seeds a @c xoroshiro128plusshixostarshixo with values taken from the
-	* iterator range [first, last) and adjusts @c first to
-	* point to the element after the last one used. If there are
-	* not enough elements or all the whole input range is zero,
-	* throws @c std::invalid_argument.
-	*
-	* @c first and @c last must be input iterators.
-	*/
-	template<class It>
-	void seed ( It& first, It last )
-	{
-		detail::fill_array_non_zero_int ( first, last, _s );
-		warmup ( );
-	}
+    /**
+    * Seeds a @c xoroshiro128plusshixostarshixo with values taken from the
+    * iterator range [first, last) and adjusts @c first to
+    * point to the element after the last one used. If there are
+    * not enough elements or all the whole input range is zero,
+    * throws @c std::invalid_argument.
+    *
+    * @c first and @c last must be input iterators.
+    */
+    template<class It>
+    void seed ( It& first, It last )
+    {
+        detail::fill_array_non_zero_int ( first, last, _s );
+        warmup ( );
+    }
 
-	/**
-	* Returns the smallest value that the @c xoroshiro128plusshixostarshixo
-	* can produce.
-	*/
-	static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-	{
-		return 0;
-	}
+    /**
+    * Returns the smallest value that the @c xoroshiro128plusshixostarshixo
+    * can produce.
+    */
+    static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+    {
+        return 0;
+    }
 
-	/**
-	* Returns the largest value that the @c xoroshiro128plusshixostarshixo
-	* can produce.
-	*/
-	static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
-	{
-		return UINT64_MAX;
-	}
+    /**
+    * Returns the largest value that the @c xoroshiro128plusshixostarshixo
+    * can produce.
+    */
+    static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ( )
+    {
+        return UINT64_MAX;
+    }
 
-	/** Returns the next value of the @c xoroshiro128plusshixostarshixo. */
-	std::uint64_t operator()( )
-	{
-		std::uint64_t r = _s [ 0 ] + _s [ 1 ];
-		next ( );
-		r = ( ( r >> 32 ) ^ r ) * std::uint64_t { 0x1AEC805299990163 };
-		return ( r >> 32 ) ^ r;
-	}
+    /** Returns the next value of the @c xoroshiro128plusshixostarshixo. */
+    std::uint64_t operator()( )
+    {
+        std::uint64_t r = _s [ 0 ] + _s [ 1 ];
+        next ( );
+        r = ( ( r >> 32 ) ^ r ) * std::uint64_t { 0x1AEC805299990163 };
+        return ( r >> 32 ) ^ r;
+    }
 
-	/** Fills a range with random values. */
-	template<class Iter>
-	void generate ( Iter first, Iter last )
-	{
-		detail::generate_from_int ( *this, first, last );
-	}
+    /** Fills a range with random values. */
+    template<class Iter>
+    void generate ( Iter first, Iter last )
+    {
+        detail::generate_from_int ( *this, first, last );
+    }
 
-	/** Advances the state of the generator by @c z. */
-	void discard ( std::uintmax_t z )
-	{
-		while ( z-- ) {
-			next ( );
-		}
-	}
+    /** Advances the state of the generator by @c z. */
+    void discard ( std::uintmax_t z )
+    {
+        while ( z-- ) {
+            next ( );
+        }
+    }
 
-	/**
-	* This is a jump function for the generator. It is equivalent
-	* to calling @c discard(2^64) @c z times; it can be used to
-	* generate 2^64 non-overlapping subsequences for parallel
-	* computations.
-	*/
-	void jump ( std::uintmax_t z = 1 )
-	{
-		while ( z-- ) {
-			std::uint64_t s0 = 0, s1 = 0;
-			for ( std::size_t b = 0; b < 64; ++b ) {
-				if ( std::uint64_t { 0xBEAC0467EBA5FACB } &std::uint64_t { 1 } << b ) {
-					s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
-				}
-				next ( );
-			}
-			for ( std::size_t b = 0; b < 64; ++b ) {
-				if ( std::uint64_t { 0xD86B048B86AA9922 } &std::uint64_t { 1 } << b ) {
-					s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
-				}
-				next ( );
-			}
-			_s [ 0 ] = s0, _s [ 1 ] = s1;
-		}
-	}
+    /**
+    * This is a jump function for the generator. It is equivalent
+    * to calling @c discard(2^64) @c z times; it can be used to
+    * generate 2^64 non-overlapping subsequences for parallel
+    * computations.
+    */
+    void jump ( std::uintmax_t z = 1 )
+    {
+        while ( z-- ) {
+            std::uint64_t s0 = 0, s1 = 0;
+            for ( std::size_t b = 0; b < 64; ++b ) {
+                if ( std::uint64_t { 0xBEAC0467EBA5FACB } &std::uint64_t { 1 } << b ) {
+                    s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
+                }
+                next ( );
+            }
+            for ( std::size_t b = 0; b < 64; ++b ) {
+                if ( std::uint64_t { 0xD86B048B86AA9922 } &std::uint64_t { 1 } << b ) {
+                    s0 ^= _s [ 0 ], s1 ^= _s [ 1 ];
+                }
+                next ( );
+            }
+            _s [ 0 ] = s0, _s [ 1 ] = s1;
+        }
+    }
 
-	friend bool operator==( const xoroshiro128plusshixostarshixo& x,
-		const xoroshiro128plusshixostarshixo& y )
-	{
-		return x._s [ 0 ] == y._s [ 0 ] && x._s [ 1 ] == y._s [ 1 ];
-	}
+    friend bool operator==( const xoroshiro128plusshixostarshixo& x,
+        const xoroshiro128plusshixostarshixo& y )
+    {
+        return x._s [ 0 ] == y._s [ 0 ] && x._s [ 1 ] == y._s [ 1 ];
+    }
 
-	friend bool operator!=( const xoroshiro128plusshixostarshixo& x,
-		const xoroshiro128plusshixostarshixo& y )
-	{
-		return !( x == y );
-	}
+    friend bool operator!=( const xoroshiro128plusshixostarshixo& x,
+        const xoroshiro128plusshixostarshixo& y )
+    {
+        return !( x == y );
+    }
 
-	/** Writes a @c xoroshiro128plusshixostarshixo to a @c std::ostream. */
-	template<class CharT, class Traits>
-	friend std::basic_ostream<CharT, Traits>&
-		operator<<( std::basic_ostream<CharT, Traits>& os,
-			const xoroshiro128plusshixostarshixo& xoro )
-	{
-		os << xoro._s [ 0 ] << ' ' << xoro._s [ 1 ];
-		return os;
-	}
+    /** Writes a @c xoroshiro128plusshixostarshixo to a @c std::ostream. */
+    template<class CharT, class Traits>
+    friend std::basic_ostream<CharT, Traits>&
+        operator<<( std::basic_ostream<CharT, Traits>& os,
+            const xoroshiro128plusshixostarshixo& xoro )
+    {
+        os << xoro._s [ 0 ] << ' ' << xoro._s [ 1 ];
+        return os;
+    }
 
-	/** Reads a @c xoroshiro128plusshixostarshixo from a @c std::istream. */
-	template<class CharT, class Traits>
-	friend std::basic_istream<CharT, Traits>&
-		operator>>( std::basic_istream<CharT, Traits>& is,
-			xoroshiro128plusshixostarshixo& xoro )
-	{
-		is >> xoro._s [ 0 ] >> std::ws >> xoro._s [ 1 ];
-		return is;
-	}
+    /** Reads a @c xoroshiro128plusshixostarshixo from a @c std::istream. */
+    template<class CharT, class Traits>
+    friend std::basic_istream<CharT, Traits>&
+        operator>>( std::basic_istream<CharT, Traits>& is,
+            xoroshiro128plusshixostarshixo& xoro )
+    {
+        is >> xoro._s [ 0 ] >> std::ws >> xoro._s [ 1 ];
+        return is;
+    }
 
 private:
 
-	/// \cond show_private
+    /// \cond show_private
 
-	// Rotate left, use of intrinsic shows no speed-up. */
-	static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
-	{
-		return ( x << k ) | ( x >> ( 64 - k ) );
-	}
+    // Rotate left, use of intrinsic shows no speed-up. */
+    static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
+    {
+        return ( x << k ) | ( x >> ( 64 - k ) );
+    }
 
-	/** Advance the state by 1 step. */
-	inline void next ( )
-	{
-		_s [ 1 ] ^= _s [ 0 ];
-		_s [ 0 ] = rotl ( _s [ 0 ], 55 );
-		_s [ 0 ] ^= _s [ 1 ];
-		_s [ 0 ] ^= _s [ 1 ] << 14;
-		_s [ 1 ] = rotl ( _s [ 1 ], 36 );
-	}
+    /** Advance the state by 1 step. */
+    inline void next ( )
+    {
+        _s [ 1 ] ^= _s [ 0 ];
+        _s [ 0 ] = rotl ( _s [ 0 ], 55 );
+        _s [ 0 ] ^= _s [ 1 ];
+        _s [ 0 ] ^= _s [ 1 ] << 14;
+        _s [ 1 ] = rotl ( _s [ 1 ], 36 );
+    }
 
-	// As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-	inline void warmup ( )
-	{
-		discard ( 8 );
-	}
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    inline void warmup ( )
+    {
+        discard ( 8 );
+    }
 
-	/// \endcond
+    /// \endcond
 
-	std::uint64_t _s [ 2 ];
+    std::uint64_t _s [ 2 ];
 };
 
 /**
@@ -1344,9 +1344,9 @@ public:
      */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(xorshift128plus, SeedSeq, seq)
     {
-		detail::seed_array_non_zero_int(seq, _s);
-		warmup();
-	}
+        detail::seed_array_non_zero_int(seq, _s);
+        warmup();
+    }
 
     /**
      * Seeds a @c xorshift128plus with values taken from the
@@ -1466,11 +1466,11 @@ private:
         _s[1] = s1 ^ _s[0] ^ (s1 >> 18) ^ (_s[0] >> 5);
     }
 
-	// As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-	inline void warmup()
-	{
-		discard(8);
-	}
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    inline void warmup()
+    {
+        discard(8);
+    }
 
     /// \endcond
 
@@ -1569,7 +1569,7 @@ public:
     {
         detail::seed_array_non_zero_int(seq, _s);
         _p = 0;
-		warmup();
+        warmup();
     }
 
     /**
@@ -1662,20 +1662,20 @@ public:
 
     friend bool operator==(const xorshift1024star& x,
         const xorshift1024star& y)
-	{
-		std::size_t i = x._p, j = y._p;
-		for (; i < 16; ++i, j = (j + 1) & 15) {
-			if (x._s[i] != y._s[j]) {
-				return false;
-			}
-		}
-		i = 0;
-		for ( ; i < x._p; ++i, j = (j + 1) & 15) {
-			if (x._s[i] != y._s[j]) {
-				return false;
-			}
-		}
-		return true;
+    {
+        std::size_t i = x._p, j = y._p;
+        for (; i < 16; ++i, j = (j + 1) & 15) {
+            if (x._s[i] != y._s[j]) {
+                return false;
+            }
+        }
+        i = 0;
+        for ( ; i < x._p; ++i, j = (j + 1) & 15) {
+            if (x._s[i] != y._s[j]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     friend bool operator!=(const xorshift1024star& x,
@@ -1688,14 +1688,14 @@ public:
     operator<<(std::basic_ostream<CharT,Traits>& os,
                const xorshift1024star& xosh)
     {
-		std::size_t i = xosh._p;
-		for (; i < 16; ++i) {
-			os << xosh._s[i] << ' ';
-		}
-		i = 0;
-		for (; i < xosh._p; ++i) {
-			os << xosh._s[i] << ' ';
-		}
+        std::size_t i = xosh._p;
+        for (; i < 16; ++i) {
+            os << xosh._s[i] << ' ';
+        }
+        i = 0;
+        for (; i < xosh._p; ++i) {
+            os << xosh._s[i] << ' ';
+        }
         return os;
     }
 
@@ -1705,9 +1705,9 @@ public:
     operator>>(std::basic_istream<CharT,Traits>& is,
                xorshift1024star& xosh)
     {
-		for (std::size_t i = 0; i < 16; ++i) {
-			is >> xosh._s[i] >> std::ws;
-		}
+        for (std::size_t i = 0; i < 16; ++i) {
+            is >> xosh._s[i] >> std::ws;
+        }
         xosh._p = 0;
         return is;
     }
@@ -1725,11 +1725,11 @@ private:
         _s[_p] = s1 ^ s0 ^ (s1 >> 11) ^ (s0 >> 30);
     }
 
-	// As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-	inline void warmup()
-	{
-		discard(64);
-	}
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    inline void warmup()
+    {
+        discard(64);
+    }
 
     /// \endcond
 

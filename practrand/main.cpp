@@ -28,11 +28,11 @@ auto main ( ) -> int {
     _setmode ( _fileno ( stdout ), _O_BINARY );
     #endif
 
-    using Generator = boost::random::xoroshiro128plusshixostar;
+    using Generator = boost::random::xoroshiro128plusshixo;
     // using Generator = pcg64;
     using result_type = typename Generator::result_type;
 
-    const boost::random::seed_seq_fe256 seq { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    const boost::random::seed_seq_fe256 seq { 11, 21, 31, 41, 51, 61, 71, 81, 91, 101 };
     Generator rng(seq);
 
     const std::size_t page_size = 524'288, buffer_size = page_size / sizeof(result_type);
