@@ -1,47 +1,3 @@
-#if 0
-#include <iostream>
-
-#include <boost/config.hpp>
-#include <boost/detail/workaround.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/typeof/typeof.hpp>
-
-template<typename T>
-char check_reference ( T & );
-
-template<typename T>
-char ( &check_reference ( T const & ) ) [ 2 ];
-
-
-# define BOOST_PROTO_DECLTYPE_NESTED_TYPEDEF_TPL_(NESTED, EXPR)                                     \
-    BOOST_TYPEOF_NESTED_TYPEDEF_TPL(BOOST_PP_CAT(nested_and_hidden_, NESTED), EXPR)                 \
-    static int const BOOST_PP_CAT(sz, NESTED) = sizeof(check_reference(EXPR));                      \
-    struct NESTED                                                                                   \
-      : boost::mpl::if_c<                                                                           \
-            1 == BOOST_PP_CAT(sz, NESTED)                                                           \
-          , typename BOOST_PP_CAT(nested_and_hidden_, NESTED)::type &                               \
-          , typename BOOST_PP_CAT(nested_and_hidden_, NESTED)::type                                 \
-        >                                                                                           \
-    {};
-# define BOOST_PROTO_DECLTYPE_(EXPR, TYPE)                                                          \
-    BOOST_PROTO_DECLTYPE_NESTED_TYPEDEF_TPL_(BOOST_PP_CAT(nested_, TYPE), (EXPR))                   \
-    typedef typename BOOST_PP_CAT(nested_, TYPE)::type TYPE;
-
-int give_type ( ) {
-
-    return 0;
-}
-
-BOOST_PROTO_DECLTYPE_( give_type, given_type )
-
-int main ( ) {
-
-    given_type t;
-
-    return 0;
-}
-#endif
 
 #ifdef _WIN32 // needed to allow binary stdout on windows
 #include <fcntl.h>
@@ -55,10 +11,10 @@ int main ( ) {
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
 #include <boost/random/random_device.hpp>
-#include <boost/random/seed_seq_fe.hpp>
-#include <boost/random/xoroshiro.hpp>
-// #include <boost/random/taus88.hpp>
-#include "taus88.hpp"
+#include "../xoroshiro128plus/seed_seq_fe.hpp"
+#include "../xoroshiro128plus/xoroshiro.hpp"
+
+#include "../xoroshiro128plus/taus88.hpp"
 
 #include <pcg/pcg_random.hpp>
 

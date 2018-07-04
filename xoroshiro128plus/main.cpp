@@ -92,7 +92,7 @@ int main ( ) {
         VOLATILE std::uint64_t acc1 = 0;
 
         {
-            at::AutoTimer t ( at::milliseconds );
+            degski::AutoTimer t ( degski::milliseconds );
 
             while ( cnt1-- )
                 acc1 += std::uniform_int_distribution<std::uint64_t> ( ) ( gen1 );
@@ -101,7 +101,7 @@ int main ( ) {
         VOLATILE std::uint64_t acc2 = 0;
 
         {
-            at::AutoTimer t ( at::milliseconds );
+            degski::AutoTimer t ( degski::milliseconds );
 
             while ( cnt2-- )
                 acc2 += std::uniform_int_distribution<std::uint64_t> ( ) ( gen2 );
@@ -110,7 +110,7 @@ int main ( ) {
         VOLATILE std::uint64_t acc3 = 0;
 
         {
-            at::AutoTimer t ( at::milliseconds );
+            degski::AutoTimer t ( degski::milliseconds );
 
             while ( cnt3-- )
                 acc3 += std::uniform_int_distribution<std::uint64_t> ( ) ( gen3 );
@@ -119,7 +119,7 @@ int main ( ) {
         VOLATILE std::uint64_t acc4 = 0;
 
         {
-            at::AutoTimer t ( at::milliseconds );
+            degski::AutoTimer t ( degski::milliseconds );
 
             while ( cnt4-- )
                 acc4 += std::uniform_int_distribution<std::uint64_t> ( ) ( gen4 );
@@ -128,7 +128,7 @@ int main ( ) {
         VOLATILE std::uint64_t acc5 = 0;
 
         {
-            at::AutoTimer t ( at::milliseconds );
+            degski::AutoTimer t ( degski::milliseconds );
 
             while ( cnt5-- )
                 acc5 += std::uniform_int_distribution<std::uint64_t> ( ) ( gen5 );
@@ -319,7 +319,7 @@ int main34342 ( ) {
     std::uint64_t acc = 0;
 
     {
-        at::AutoTimer t ( at::milliseconds );
+        degski::AutoTimer t ( degski::milliseconds );
 
         while ( cnt-- )
         acc += std::uniform_int_distribution<std::uint32_t> ( ) ( gen );
