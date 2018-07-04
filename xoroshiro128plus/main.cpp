@@ -23,7 +23,7 @@
 
 #define PCG_USE_ZEROCHECK_ROTATE_IDIOM 1
 
-#include <autotimer.hpp>
+#include "autotimer.hpp"
 
 std::uint64_t integer_hash ( std::uint64_t x )
 {
