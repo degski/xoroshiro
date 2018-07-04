@@ -3,8 +3,9 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
 * cmwc, C99 Complementary Multiply With Carry generator;
 * practrand, build a generator for use with `practrand`;
-* xoroshiro, and amongst others a modified version of `xoroshiro128plus`. For lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark), but less and later. Other news regarding this generator is that testing shows that `xoroshiro128plusshixo` is **approximately 10% faster** than `xoroshiro128plus`.
-* All code to verify the above claim is available in this repo.
+* xoroshiro, and amongst others a modified version of `xoroshiro128plus`. For lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
+* Testing shows that `xoroshiro128plusshixo` is **approximately 10% faster** than `xoroshiro128plus`;
+* All code to verify the above claim is available in this repo;
 * This modification was found by me (while fiddling), I am not aware of prior art;
 * I intend to add the newer [`xoshiro256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c)  and do some quality and speed testing;
 
