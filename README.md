@@ -6,9 +6,9 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 * xoroshiro, `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
 * Testing shows that `xoroshiro128plusshixo` is **approximately 10% faster** than `xoroshiro128plus`;
 * All code to verify the above claim is available in this repo;
-* This modification was found by me (while fiddling), I am not aware of prior art;
+* `xoroshiro128plusshixo` 'found' by me (while fiddling), I am not aware of prior-art;
 * I intend to add the newer [`xoshiro256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c)  and do some quality and speed testing;
-
+* TODO: Implement `xoroshiro128plus` or `xoroshiro128plusshixo` in AVX2, 4 parallel states and generators, **but with a twist**, which could make quite the difference. I've implemented and published [lane-crossing shift and rotation in AVX2](https://gist.github.com/degski/b5fbac1ec6c8200d1d8ad102f89df89f). In my mind this would solve the low-bits problem in xoroshiro, as we will be shifting or rotating the entire 256 bits around, hence they actually move between the individual states of the 4 parallel generators. This means that the low bits don't get stuck, but are mixed by neighbouring generators and [the generators] will be mutually improving each other. I don't expect a lot of speed improvement (it's not cheap, I've indicated the expected latencies in the gist), if any, but, in qualitative terms, the result should be better.
 
 ## Some test results
 
