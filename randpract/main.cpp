@@ -11,10 +11,10 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
 #include <boost/random/random_device.hpp>
-#include "../xoroshiro128plus/seed_seq_fe.hpp"
-#include "../xoroshiro128plus/xoroshiro.hpp"
+#include "../xoroshiro/seed_seq_fe.hpp"
+#include "../xoroshiro/xoroshiro.hpp"
 
-#include "../xoroshiro128plus/taus88.hpp"
+#include "../xoroshiro/taus88.hpp"
 
 #include <pcg/pcg_random.hpp>
 
