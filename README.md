@@ -3,7 +3,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
 * cmwc, C99 Complementary Multiply With Carry generator;
 * practrand, build a generator for use with `practrand`;
-* xoroshiro, and amongst others a modified version of `xoroshiro128plus`. For lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
+* xoroshiro, `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, and amongst others a modified version of `xoroshiro128plus`. For lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
 * Testing shows that `xoroshiro128plusshixo` is **approximately 10% faster** than `xoroshiro128plus`;
 * All code to verify the above claim is available in this repo;
 * This modification was found by me (while fiddling), I am not aware of prior art;
