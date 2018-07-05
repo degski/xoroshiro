@@ -129,6 +129,10 @@ Tested were conducted with `PractRand 0.93 x64`. Not al tests have run for equal
     length= 32 gigabytes (2^35 bytes), time= 604 seconds
       no anomalies in 233 test result(s)
 
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 128 gigabytes (2^37 bytes), time= 2374 seconds
+      no anomalies in 255 test result(s)
+
 
 #### xoshiro256plus
 
