@@ -22,7 +22,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
     xoroshiro128plus                  3500 ms (1.08)
     xoroshiro128plusshixo             3240 ms (1.00) 
 
-The test were conducted on an `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, built with [`Clang/LLVM-7.0.0-r333363-win64`](https://llvm.org/builds/) () (has been updated since).
+The test were conducted on an `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, built with [`Clang/LLVM-7.0.0-r333363-win64`](https://llvm.org/builds/) () (has been updated since), relevant command line parameters `-O3 -ffast-math -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2`.
 
 
 ### Quality test 
