@@ -16,13 +16,13 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
 ### Speedtest (showing relative difference, the absolute number is not relevant)
 
-    xoroshiro128plus                  3500 ms
-    xoshiro256starstar                4550 ms
-    xoshiro256plus                    4360 ms
-    xoroshiro128plusshixo             3240 ms
-    pcg64                             3800 ms
+    xoshiro256starstar                4550 ms (1.40)
+    xoshiro256plus                    4360 ms (1.35)
+    pcg64                             3800 ms (1.17)
+    xoroshiro128plus                  3500 ms (1.08)
+    xoroshiro128plusshixo             3240 ms (1.00) 
 
-The test were conducted on a `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, using [`Clang/LLVM-7.0.0-r333363-win64`](https://llvm.org/builds/) () (has been updated since).
+The test were conducted on an `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, built with [`Clang/LLVM-7.0.0-r333363-win64`](https://llvm.org/builds/) () (has been updated since).
 
 
 ### Quality test 
