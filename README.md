@@ -3,8 +3,8 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
 * cmwc, C99 Complementary Multiply With Carry generator;
 * practrand, build a generator for use with `practrand`;
-* xoroshiro, `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [xoshiro256plus](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
-* Testing shows that `xoroshiro128plusshixo` is **approximately 7.5% faster** than `xoroshiro128plus`;
+* xoroshiro, `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [`xoshiro256plus`](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
+* Testing shows that `xoroshiro128plusshixo` is **approximately 8% faster** than `xoroshiro128plus`;
 * All code to verify the above claim is available in this repo;
 * I did not yet make any effort to avoid code duplication, surely this can be done far more cleverly, but for now it's just copy a generator, change some lines and go, wash, rinse, repeat;
 * `xoroshiro128plusshixo` 'found' by me (while fiddling), I am not aware of prior-art;
@@ -12,6 +12,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 * TODO2: Implement `xoroshiro128plus` or `xoroshiro128plusshixo` in AVX2, 4 parallel states and generators, **but with a twist**, which could make quite the difference. I've implemented and published [lane-crossing shift and rotation in AVX2](https://gist.github.com/degski/b5fbac1ec6c8200d1d8ad102f89df89f). In my mind this would solve the low-bits problem in `xoroshiro`, as we will be shifting or rotating the entire 256 bits around, hence they actually move between the individual states of the 4 parallel generators. This means that the low bits don't get stuck, but are mixed by neighbouring generators and [the generators] will be mutually improving each other. I don't expect a lot of speed improvement (it's not cheap, I've indicated the expected latencies in the gist), if any, but, in qualitative terms, the result should be better.
 
 ## Some test results
+
 ### Speedtest (showing relative difference, the absolute number is not relevant)
 
     xoroshiro128plus                  3500 ms
@@ -21,6 +22,11 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
     pcg64                             3800 ms
 
 The test were conducted on a `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, using [`Clang/LLVM-7.0.0-r333363-win64`](https://llvm.org/builds/) () (has been updated since).
+
+
+### Quality test 
+
+Tested were conducted using `PractRand 0.93 x64`. Not al tests have run for equal amounts of time and were interupted as the output did not seem to add much more information.
 
 
 #### xoroshiro128plus
