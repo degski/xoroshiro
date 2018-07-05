@@ -1,9 +1,10 @@
 # xoroshiro
 Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
-* cmwc, C99 Complementary Multiply With Carry generator;
-* practrand, build a generator for use with `practrand`;
-* xoroshiro, `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [`xoshiro256plus`](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
+* project folders:
+    * cmwc: C99 Complementary Multiply With Carry generator;
+    * practrand: build a generator for use with `practrand`;
+    * xoroshiro: `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [`xoshiro256plus`](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
 * Testing shows that `xoroshiro128plusshixo` is **approximately 8% faster** than `xoroshiro128plus`;
 * Testing shows that `xoshiro256starstar` is of very good quality (on par with `pcg64`), but also the **slowest** in the lot (some 17% slower than `pcg64`);
 * All code to verify the above claim is available in this repo;
