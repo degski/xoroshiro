@@ -5,7 +5,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
   * **cmwc**: C99 Complementary Multiply With Carry generator;
   * **practrand**: build a generator for use with `practrand`;
   * **xoroshiro**: `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [`xoshiro256plus`](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've baptised `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark), but it is the fastest;
-* Testing shows that `xoroshiro128plusshixo` is **approximately 8% faster** than `xoroshiro128plus`;
+* Testing shows that `xoroshiro128plusshixo` is **approximately 8% faster** than `xoroshiro128plus`. This result is possibly only typical for the [x86] hardware it was tested on (Intel Ci-5005U);
 * Testing shows that `xoshiro256starstar` is of very good quality (on par with `pcg64`), but also the **slowest** in the lot (some 17% slower than `pcg64`);
 * All code to verify the above claim is available in this repo;
 * I did not yet make any effort to avoid code duplication, surely this can coded far more cleverly, but for now it's just copy a generator, change some lines and go, wash, rinse, repeat;
@@ -143,7 +143,7 @@ Tested were conducted with `practrand 0.93 x64`. Not al tests have run for equal
 
 
 
-#### xoroshiro128plusshixo
+#### xoroshiro128plusshixo ( xoroshiro128plus + finalizer ( r > 32 ) ^ r ) )
 
     RNG_test using PractRand version 0.93
     RNG = RNG_stdin64, seed = 0xc24c83c5
@@ -201,7 +201,7 @@ Tested were conducted with `practrand 0.93 x64`. Not al tests have run for equal
     ...and 253 test result(s) without anomalies
 
 
-#### xoroshiro128plusshixostar
+#### xoroshiro128plusshixostar ( xoroshiro128plus + finalizer ( (r >> 32) ^ r ) * 0x1AEC805299990163 ) )
 
     RNG_test using PractRand version 0.93
     RNG = RNG_stdin64, seed = 0x833d33c6
@@ -283,11 +283,11 @@ Tested were conducted with `practrand 0.93 x64`. Not al tests have run for equal
     no anomalies in 319 test result(s)
 
     rng=RNG_stdin64, seed=0x833d33c6
-    length= 16 terabytes (2^44 bytes), time= 298426 seconds
+    length= 16 terabytes (2^44 bytes), time= 298426 seconds (took 3.5 days!!!)
     no anomalies in 329 test result(s)
 
 
-#### xoroshiro128plusshixostarshixo
+#### xoroshiro128plusshixostarshixo ( xoroshiro128plus + finalizer ( ( r >> 32 ) ^ r ) * 0x1AEC805299990163 ) + finalizer ( r > 32 ) ^ r ) )
 
     RNG_test using PractRand version 0.93
     RNG = RNG_stdin64, seed = 0x81da82c3
