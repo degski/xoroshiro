@@ -5,6 +5,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 * practrand, build a generator for use with `practrand`;
 * xoroshiro, `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [`xoshiro256plus`](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've called it `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark);
 * Testing shows that `xoroshiro128plusshixo` is **approximately 8% faster** than `xoroshiro128plus`;
+* Testing shows that `xoshiro256starstar` is of very good quality (on par with `pcg64`), but also the **slowest** in the lot (some 17% slower than `pcg64`);
 * All code to verify the above claim is available in this repo;
 * I did not yet make any effort to avoid code duplication, surely this can be done far more cleverly, but for now it's just copy a generator, change some lines and go, wash, rinse, repeat;
 * `xoroshiro128plusshixo` 'found' by me (while fiddling), I am not aware of prior-art;
@@ -26,7 +27,7 @@ The test were conducted on a `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, using
 
 ### Quality test 
 
-Tested were conducted using `PractRand 0.93 x64`. Not al tests have run for equal amounts of time and were interupted as the output did not seem to add much more information.
+Tested were conducted with `PractRand 0.93 x64`. Not al tests have run for equal amounts of time and were interupted as and when the output did not seem to add much more information.
 
 
 #### xoroshiro128plus
@@ -86,7 +87,47 @@ Tested were conducted using `PractRand 0.93 x64`. Not al tests have run for equa
     ...and 183 test result(s) without anomalies
 
 
-#### xoshiro256starstar
+#### xoshiro256starstar (first results)
+
+    RNG_test using PractRand version 0.93
+    RNG = RNG_stdin64, seed = 0x4503a3da
+    test set = normal, folding = standard (64 bit)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 128 megabytes (2^27 bytes), time= 2.4 seconds
+      no anomalies in 148 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 256 megabytes (2^28 bytes), time= 5.5 seconds
+      no anomalies in 159 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 512 megabytes (2^29 bytes), time= 10.8 seconds
+      no anomalies in 169 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 1 gigabyte (2^30 bytes), time= 21.5 seconds
+      no anomalies in 180 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 2 gigabytes (2^31 bytes), time= 41.3 seconds
+      no anomalies in 191 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 4 gigabytes (2^32 bytes), time= 78.3 seconds
+      no anomalies in 201 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 8 gigabytes (2^33 bytes), time= 156 seconds
+      no anomalies in 212 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 16 gigabytes (2^34 bytes), time= 308 seconds
+      no anomalies in 223 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 32 gigabytes (2^35 bytes), time= 604 seconds
+      no anomalies in 233 test result(s)
 
 
 #### xoshiro256plus
