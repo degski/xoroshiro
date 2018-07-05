@@ -10,7 +10,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 * All code to verify the above claim is available in this repo;
 * I did not yet make any effort to avoid code duplication, surely this can coded far more cleverly, but for now it's just copy a generator, change some lines and go, wash, rinse, repeat;
 * `xoroshiro128plusshixo` 'found' by me (while fiddling), I am not aware of prior-art;
-* TODO1: Test the idea of `xoroshiro128plusshixo` with `r = ( ( r << 32 ) | ( r >> 32 ) ) ^ r`, or just `r = ( r << 32 ) | ( r >> 32 )`, i.e. **moving the bad bits to the middle**;
+* TODO1: Test `xoroshiro128plusshixo` with `r = ( r >> 48 ) ^ r`;
 * TODO2: Implement `xoroshiro128plus` or `xoroshiro128plusshixo` in AVX2, 4 parallel states and generators, **but with a twist**, which could make quite the difference. I've implemented and published [lane-crossing shift and rotation in AVX2](https://gist.github.com/degski/b5fbac1ec6c8200d1d8ad102f89df89f). In my mind this would solve the low-bits problem in `xoroshiro`, as we will be shifting or rotating the entire 256 bits around, hence they actually move between the individual states of the 4 parallel generators. This means that the low bits don't get stuck, but are mixed by neighbouring generators and [the generators] will be mutually improving each other. I don't expect a lot of speed improvement (it's not cheap, I've indicated the expected latencies in the gist), if any, but, in qualitative terms, the result should be better.
 
 ## Some test results

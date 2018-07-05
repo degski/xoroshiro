@@ -78,10 +78,10 @@ int main ( ) {
 
     std::uint64_t cnt = 1;
 
-    boost::random::xoroshiro128plus gen1 ( seq_fe );
-    boost::random::xoshiro256starstar gen2 ( seq_fe );
-    boost::random::xoshiro256plus gen3 ( seq_fe );
-    boost::random::xoroshiro128plusshixo gen4 ( seq_fe );
+    GeneratorCache<boost::random::xoroshiro128plus> gen1 ( seq_fe );
+    GeneratorCache<boost::random::xoshiro256starstar> gen2 ( seq_fe );
+    GeneratorCache<boost::random::xoshiro256plus> gen3 ( seq_fe );
+    GeneratorCache<boost::random::xoroshiro128plusshixo> gen4 ( seq_fe );
     pcg64 gen5 ( seq_fe );
 
     while ( cnt-- ) {
