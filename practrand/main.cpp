@@ -36,7 +36,7 @@ auto main ( ) -> int {
     _setmode ( _fileno ( stdout ), _O_BINARY );
     #endif
 
-    using Generator = boost::random::xoshiro256starstar;
+    using Generator = boost::random::xoroshiro128plusshixo;
     // using Generator = pcg64;
     using result_type = typename Generator::result_type;
 

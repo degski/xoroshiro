@@ -15,7 +15,7 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
 ## Some test results
 
-### Speedtest (showing relative difference, the absolute number is not relevant)
+### Speedtest (showing relative difference, the absolute number is not relevant) (IT APPEARS I HAVE TO HAVE ANOTHER LOOK AT THIS)
 
     xoshiro256starstar                4550 ms (1.40)
     xoshiro256plus                    4360 ms (1.35)
@@ -137,6 +137,10 @@ Tested were conducted with `practrand 0.93 x64`. Not al tests have run for equal
     rng=RNG_stdin64, seed=0x4503a3da
     length= 128 gigabytes (2^37 bytes), time= 2374 seconds
       no anomalies in 255 test result(s)
+
+    rng=RNG_stdin64, seed=0x4503a3da
+    length= 256 gigabytes (2^38 bytes), time= 4666 seconds
+      no anomalies in 265 test result(s)
 
 
 #### xoshiro256plus
