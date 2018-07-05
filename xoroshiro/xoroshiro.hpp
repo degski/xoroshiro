@@ -36,7 +36,7 @@ namespace random {
 
     namespace detail {
 
-        inline std::uint64_t xoroshiro_integer_hash ( std::uint64_t x );
+        std::uint64_t xoroshiro_integer_hash ( std::uint64_t x );
     }
 
     /**
@@ -51,6 +51,7 @@ namespace random {
     */
     class splitmix64 {
         friend class xoroshiro128plus;
+        friend class xoshiro256starstar;
         friend class xoroshiro128plusshixo;
         friend class xoroshiro128plusshixostar;
         friend class xoroshiro128plusshixostarshixo;
@@ -231,12 +232,12 @@ namespace random {
 
         /// \cond show_private
 
-        inline std::uint64_t next ( )
+        std::uint64_t next ( )
         {
             return ( _s [ 0 ] += std::uint64_t { 0x9E3779B97F4A7C15 } );
         }
 
-        static inline std::uint64_t hash ( std::uint64_t z )
+        static std::uint64_t hash ( std::uint64_t z )
         {
             z = ( z ^ ( z >> 30 ) ) * std::uint64_t { 0xBF58476D1CE4E5B9 };
             z = ( z ^ ( z >> 27 ) ) * std::uint64_t { 0x94D049BB133111EB };
@@ -252,7 +253,7 @@ namespace detail {
 
     // const std::uint64_t v = 0x1AEC805299990163, y = 0xCDFB859A3DD0884B;
 
-    inline std::uint64_t xoroshiro_integer_hash(std::uint64_t x)
+    std::uint64_t xoroshiro_integer_hash(std::uint64_t x)
     {
         x = ((x >> 32) ^ x) * std::uint64_t { 0x1AEC805299990163 };
         x = ((x >> 32) ^ x);
@@ -413,8 +414,8 @@ public:
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(xoroshiro128plus, std::uint64_t, value)
     {
         std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-        _s[0] = splitmix64::hash(s);
-        _s[1] = splitmix64::hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+        _s[0] = detail::xoroshiro_integer_hash (s);
+        _s[1] = detail::xoroshiro_integer_hash ((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
     }
 
     /**
@@ -537,11 +538,11 @@ private:
     /// \cond show_private
 
     // Rotate left, use of intrinsic shows no speed-up. */
-    static inline std::uint64_t rotl(const std::uint64_t x, const int k)
+    static std::uint64_t rotl(const std::uint64_t x, const int k)
     { return (x << k) | (x >> (64 - k)); }
 
     /** Advance the state by 1 step. */
-    inline void next()
+    void next()
     {
         _s[1] ^= _s [0];
         _s[0] = rotl(_s[0], 55);
@@ -551,7 +552,7 @@ private:
     }
 
     // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-    inline void warmup()
+    void warmup()
     {
         discard(8);
     }
@@ -560,6 +561,545 @@ private:
 
     std::uint64_t _s[2];
 };
+
+/**
+ * From the source implmentation, expressing the opinions of the original
+ * authors:
+ *
+ * Written in 2018 by David Blackman and Sebastiano Vigna (vigna@acm.org)
+ *
+ * To the extent possible under law, the author has dedicated all copyright
+ * and related and neighboring rights to this software to the public domain
+ * worldwide. This software is distributed without any warranty.
+ *
+ * See <http:*creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ * This is xoshiro256starstar 1.0, our all-purpose, rock-solid generator. It
+ * has excellent (sub-ns) speed, a state (256 bits) that is large enough for
+ * any parallel application, and it passes all tests we are aware of.
+ *
+ * For generating just floating-point numbers, xoshiro256plus is even faster.
+ *
+ * The state must be seeded so that it is not everywhere zero. If you have
+ * a 64-bit seed, we suggest to seed a splitmix64 generator and use its
+ * output to fill s.
+ */
+
+class xoshiro256starstar
+{
+public:
+    typedef std::uint64_t result_type;
+
+    // Required for old Boost.Random concept.
+    static const bool has_fixed_range = true;
+    static const std::uint64_t default_seed = 1;
+
+    /**
+     * Constructs a @c xoshiro256starstar, using the default seed.
+     */
+    xoshiro256starstar()
+    { seed(); }
+
+    /**
+     * Constructs a @c xoshiro256starstar, seeding it with @c value.
+     */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(xoshiro256starstar,
+                                               std::uint64_t, value)
+    { seed(value); }
+
+    /**
+     * Constructs a @c xoshiro256starstar, seeding it with values
+     * produced by a call to @c seq.generate().
+     */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(xoshiro256starstar,
+                                             SeedSeq, seq)
+    { seed(seq); }
+
+    /**
+     * Constructs a @c xoshiro256starstar and seeds it with values
+     * taken from the iterator range [first, last) and adjusts
+     * first to point to the element after the last one used.
+     * If there are not enough elements, throws @c std::invalid_argument.
+     *
+     * first and last must be input iterators.
+     */
+    template<class It>
+    xoshiro256starstar(It& first, It last)
+    { seed(first, last); }
+
+    // compiler-generated copy constructor and assignment operator are fine.
+
+    /**
+     * Calls seed(default_seed)
+     */
+    void seed()
+    { seed(default_seed); }
+
+    /**
+     * seeds a @c xoshiro256starstar with splitmix64, as per Sebastiano
+     * Vigna's recommendation.
+     */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(xoshiro256starstar, std::uint64_t, value)
+    {
+        std::uint64_t s = value + std::uint64_t ( 0x9E3779B97F4A7C15 );
+        _s[0] = detail::xoroshiro_integer_hash(s);
+        _s[1] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+        _s[2] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+        _s[3] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+    }
+
+    /**
+     * Seeds a @c xoshiro256starstar using values from a SeedSeq. If a
+     * valid seed cannot be generated throws @c std::runtime_error.
+     */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(xoshiro256starstar, SeedSeq, seq)
+    {
+        detail::seed_array_non_zero_int(seq, _s);
+        warmup();
+    }
+
+    /**
+     * Seeds a @c xoshiro256starstar with values taken from the
+     * iterator range [first, last) and adjusts @c first to
+     * point to the element after the last one used. If there are
+     * not enough elements or all the whole input range is zero,
+     * throws @c std::invalid_argument.
+     *
+     * @c first and @c last must be input iterators.
+     */
+    template<class It>
+    void seed(It& first, It last)
+    {
+        detail::fill_array_non_zero_int(first, last, _s);
+        warmup();
+    }
+
+    /**
+     * Returns the smallest value that the @c xoshiro256starstar
+     * can produce.
+     */
+    static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    { return 0; }
+
+    /**
+     * Returns the largest value that the @c xoshiro256starstar
+     * can produce.
+     */
+    static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    { return UINT64_MAX; }
+
+    /** Returns the next value of the @c xoshiro256starstar. */
+    std::uint64_t operator()()
+    {
+        const std::uint64_t r = rotl ( _s[1] * 5, 7 ) * 9;
+        next();
+        return r;
+    }
+
+    /** Fills a range with random values. */
+    template<class Iter>
+    void generate(Iter first, Iter last)
+    { detail::generate_from_int(*this, first, last); }
+
+    /** Advances the state of the generator by @c z. */
+    void discard(std::uintmax_t z)
+    {
+        while (z--) {
+            next();
+        }
+    }
+
+    /**
+     * This is the jump function for @c xoshiro256starstar. It is equivalent
+     * to 2^128 calls to next() @c z times; it can be used to generate
+     * 2^128 non-overlapping subsequences for parallel computations.
+     */
+    void jump(std::uintmax_t z = 1)
+    {
+        static const std::uint64_t JUMP[4] = { 0x180EC6D33CFD0ABA, 0xD5A61266F0C9392C, 0xA9582618E03FC9AA, 0x39ABDC4529B1661C };
+        while(z--) {
+            std::uint64_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+            for ( int i = 0; i < sizeof JUMP / sizeof *JUMP; i++ )
+                for ( int b = 0; b < 64; ++b ) {
+                    if ( JUMP[i] & std::uint64_t(1) << b ) {
+                        s0 ^= _s[0];
+                        s1 ^= _s[1];
+                        s2 ^= _s[2];
+                        s3 ^= _s[3];
+                    }
+                    next();
+                }
+
+            _s[0] = s0;
+            _s[1] = s1;
+            _s[2] = s2;
+            _s[3] = s3;
+        }
+    }
+
+    /**
+     * This is the long-jump function for @c xoshiro256starstar. It is
+     * equivalent to 2^192 calls to next(); it can be used to generate
+     * 2^64 starting points, from each of which jump() will generate
+     * 2^64 non-overlapping subsequences for parallel distributed
+     * computations.
+     */
+    void long_jump()
+    {
+        static const std::uint64_t LONG_JUMP[4] = { 0x76E15D3EFEFDCBBF, 0xC5004E441C522FB3, 0x77710069854EE241, 0x39109BB02ACBE635 };
+        std::uint64_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+        for ( std::size_t i = 0; i < sizeof LONG_JUMP / sizeof *LONG_JUMP; ++i )
+            for ( std::size_t b = 0; b < std::size_t ( 64 ); ++b ) {
+                if ( LONG_JUMP[i] & std::uint64_t ( 1 ) << b ) {
+                    s0 ^= _s[0];
+                    s1 ^= _s[1];
+                    s2 ^= _s[2];
+                    s3 ^= _s[3];
+                }
+                next();
+            }
+
+        _s[0] = s0;
+        _s[1] = s1;
+        _s[2] = s2;
+        _s[3] = s3;
+    }
+
+    friend bool operator==(const xoshiro256starstar& x,
+                           const xoshiro256starstar& y)
+    { return x._s[0] == y._s[0] && x._s[1] == y._s[1] && x._s [2] == y._s [2] && x._s [3] == y._s [3]; }
+
+    friend bool operator!=(const xoshiro256starstar& x,
+                           const xoshiro256starstar& y)
+    { return !(x == y); }
+
+    /** Writes a @c xoshiro256starstar to a @c std::ostream. */
+    template<class CharT, class Traits>
+    friend std::basic_ostream<CharT,Traits>&
+    operator<<(std::basic_ostream<CharT,Traits>& os,
+               const xoshiro256starstar& xoro)
+    {
+        os << xoro._s[0] << ' ' << xoro._s[1] << ' ' << xoro._s[2] << ' ' << xoro._s[3];
+        return os;
+    }
+
+    /** Reads a @c xoshiro256starstar from a @c std::istream. */
+    template<class CharT, class Traits>
+    friend std::basic_istream<CharT,Traits>&
+    operator>>(std::basic_istream<CharT,Traits>& is,
+               xoshiro256starstar& xoro)
+    {
+        is >> xoro._s[0] >> std::ws >> xoro._s[1] >> std::ws >> xoro._s[2] >> std::ws >> xoro._s[3];
+        return is;
+    }
+
+private:
+
+    /// \cond show_private
+
+    // Rotate left, use of intrinsic shows no speed-up. */
+    static std::uint64_t rotl(const std::uint64_t x, const int k)
+    { return (x << k) | (x >> (64 - k)); }
+
+    /** Advance the state by 1 step. */
+    void next()
+    {
+        const std::uint64_t t = _s[1] << 17;
+
+        _s[2] ^= _s[0];
+        _s[3] ^= _s[1];
+        _s[1] ^= _s[2];
+        _s[0] ^= _s[3];
+
+        _s[2] ^= t;
+
+        _s[3] = rotl ( _s[3], 45 );
+    }
+
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    void warmup()
+    {
+        discard(8);
+    }
+
+    /// \endcond
+
+    std::uint64_t _s[4];
+};
+
+
+/**
+ * From the source implmentation, expressing the opinions of the original
+ * authors:
+ *
+ *  Written in 2018 by David Blackman and Sebastiano Vigna (vigna@acm.org)
+ *
+ * To the extent possible under law, the author has dedicated all copyright
+ * and related and neighboring rights to this software to the public domain
+ * worldwide. This software is distributed without any warranty.
+ *
+ * See <http://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ *
+ * This is xoshiro256plus 1.0, our best and fastest generator for floating-point
+ * numbers. We suggest to use its upper bits for floating-point
+ * generation, as it is slightly faster than xoshiro256starstar. It passes all
+ * tests we are aware of except for the lowest three bits, which might
+ * fail linearity tests (and just those), so if low linear complexity is
+ * not considered an issue (as it is usually the case) it can be used to
+ * generate 64-bit outputs, too.
+ *
+ * We suggest to use a sign test to extract a random Boolean value, and
+ * right shifts to extract subsets of bits.
+ *
+ * The state must be seeded so that it is not everywhere zero. If you have
+ * a 64-bit seed, we suggest to seed a splitmix64 generator and use its
+ * output to fill s.
+ */
+
+class xoshiro256plus
+{
+public:
+    typedef std::uint64_t result_type;
+
+    // Required for old Boost.Random concept.
+    static const bool has_fixed_range = true;
+    static const std::uint64_t default_seed = 1;
+
+    /**
+     * Constructs a @c xoshiro256plus, using the default seed.
+     */
+    xoshiro256plus()
+    { seed(); }
+
+    /**
+     * Constructs a @c xoshiro256plus, seeding it with @c value.
+     */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(xoshiro256plus,
+                                               std::uint64_t, value)
+    { seed(value); }
+
+    /**
+     * Constructs a @c xoshiro256plus, seeding it with values
+     * produced by a call to @c seq.generate().
+     */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(xoshiro256plus,
+                                             SeedSeq, seq)
+    { seed(seq); }
+
+    /**
+     * Constructs a @c xoshiro256plus and seeds it with values
+     * taken from the iterator range [first, last) and adjusts
+     * first to point to the element after the last one used.
+     * If there are not enough elements, throws @c std::invalid_argument.
+     *
+     * first and last must be input iterators.
+     */
+    template<class It>
+    xoshiro256plus(It& first, It last)
+    { seed(first, last); }
+
+    // compiler-generated copy constructor and assignment operator are fine.
+
+    /**
+     * Calls seed(default_seed)
+     */
+    void seed()
+    { seed(default_seed); }
+
+    /**
+     * seeds a @c xoshiro256plus with splitmix64, as per Sebastiano
+     * Vigna's recommendation.
+     */
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(xoshiro256plus, std::uint64_t, value)
+    {
+        std::uint64_t s = value + std::uint64_t ( 0x9E3779B97F4A7C15 );
+        _s[0] = detail::xoroshiro_integer_hash(s);
+        _s[1] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+        _s[2] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+        _s[3] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+    }
+
+    /**
+     * Seeds a @c xoshiro256plus using values from a SeedSeq. If a
+     * valid seed cannot be generated throws @c std::runtime_error.
+     */
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(xoshiro256plus, SeedSeq, seq)
+    {
+        detail::seed_array_non_zero_int(seq, _s);
+        warmup();
+    }
+
+    /**
+     * Seeds a @c xoshiro256plus with values taken from the
+     * iterator range [first, last) and adjusts @c first to
+     * point to the element after the last one used. If there are
+     * not enough elements or all the whole input range is zero,
+     * throws @c std::invalid_argument.
+     *
+     * @c first and @c last must be input iterators.
+     */
+    template<class It>
+    void seed(It& first, It last)
+    {
+        detail::fill_array_non_zero_int(first, last, _s);
+        warmup();
+    }
+
+    /**
+     * Returns the smallest value that the @c xoshiro256plus
+     * can produce.
+     */
+    static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    { return 0; }
+
+    /**
+     * Returns the largest value that the @c xoshiro256plus
+     * can produce.
+     */
+    static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    { return UINT64_MAX; }
+
+    /** Returns the next value of the @c xoshiro256plus. */
+    std::uint64_t operator()()
+    {
+        const std::uint64_t r = _s[0] + _s[3];
+        next();
+        return r;
+    }
+
+    /** Fills a range with random values. */
+    template<class Iter>
+    void generate(Iter first, Iter last)
+    { detail::generate_from_int(*this, first, last); }
+
+    /** Advances the state of the generator by @c z. */
+    void discard(std::uintmax_t z)
+    {
+        while (z--) {
+            next();
+        }
+    }
+
+    /**
+     * This is the jump function for @c xoshiro256plus. It is equivalent
+     * to 2^128 calls to next() @c z times; it can be used to generate
+     * 2^128 non-overlapping subsequences for parallel computations.
+     */
+    void jump(std::uintmax_t z = 1)
+    {
+        static const std::uint64_t JUMP[4] = { 0x180EC6D33CFD0ABA, 0xD5A61266F0C9392C, 0xA9582618E03FC9AA, 0x39ABDC4529B1661C };
+        while(z--) {
+            std::uint64_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+            for(std::size_t i = 0; i < sizeof JUMP / sizeof *JUMP; ++i)
+                for(std::size_t b = 0; b < std::size_t(64); ++b) {
+                    if (JUMP[i] & std::uint64_t(1) << b) {
+                        s0 ^= _s[0];
+                        s1 ^= _s[1];
+                        s2 ^= _s[2];
+                        s3 ^= _s[3];
+                    }
+                    next();
+                }
+
+            _s[0] = s0;
+            _s[1] = s1;
+            _s[2] = s2;
+            _s[3] = s3;
+        }
+    }
+
+    /**
+     * This is the long-jump function for @c xoshiro256plus. It is
+     * equivalent to 2^192 calls to next(); it can be used to generate
+     * 2^64 starting points, from each of which jump() will generate
+     * 2^64 non-overlapping subsequences for parallel distributed
+     * computations.
+     */
+    void long_jump()
+    {
+        static const std::uint64_t LONG_JUMP[] = { 0x76E15D3EFEFDCBBF, 0xC5004E441C522FB3, 0x77710069854EE241, 0x39109BB02ACBE635 };
+
+        std::uint64_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+        for(std::size_t i = 0; i < sizeof LONG_JUMP / sizeof *LONG_JUMP; ++i)
+            for(std::size_t b = 0; b < std::size_t(64); ++b) {
+                if (LONG_JUMP[i] & std::uint64_t(1) << b) {
+                    s0 ^= _s[0];
+                    s1 ^= _s[1];
+                    s2 ^= _s[2];
+                    s3 ^= _s[3];
+                }
+                next();
+            }
+
+        _s[0] = s0;
+        _s[1] = s1;
+        _s[2] = s2;
+        _s[3] = s3;
+    }
+
+    friend bool operator==(const xoshiro256plus& x,
+                           const xoshiro256plus& y)
+    { return x._s[0] == y._s[0] && x._s[1] == y._s[1] && x._s [2] == y._s [2] && x._s [3] == y._s [3]; }
+
+    friend bool operator!=(const xoshiro256plus& x,
+                           const xoshiro256plus& y)
+    { return !(x == y); }
+
+    /** Writes a @c xoshiro256plus to a @c std::ostream. */
+    template<class CharT, class Traits>
+    friend std::basic_ostream<CharT,Traits>&
+    operator<<(std::basic_ostream<CharT,Traits>& os,
+               const xoshiro256plus& xoro)
+    {
+        os << xoro._s[0] << ' ' << xoro._s[1] << ' ' << xoro._s[2] << ' ' << xoro._s[3];
+        return os;
+    }
+
+    /** Reads a @c xoshiro256plus from a @c std::istream. */
+    template<class CharT, class Traits>
+    friend std::basic_istream<CharT,Traits>&
+    operator>>(std::basic_istream<CharT,Traits>& is,
+               xoshiro256plus& xoro)
+    {
+        is >> xoro._s[0] >> std::ws >> xoro._s[1] >> std::ws >> xoro._s[2] >> std::ws >> xoro._s[3];
+        return is;
+    }
+
+private:
+
+    /// \cond show_private
+
+    // Rotate left, use of intrinsic shows no speed-up. */
+    static std::uint64_t rotl(const std::uint64_t x, const int k)
+    { return (x << k) | (x >> (64 - k)); }
+
+    /** Advance the state by 1 step. */
+    void next()
+    {
+        const uint64_t t = _s[1] << 17;
+
+        _s[2] ^= _s[0];
+        _s[3] ^= _s[1];
+        _s[1] ^= _s[2];
+        _s[0] ^= _s[3];
+
+        _s[2] ^= t;
+
+        _s[3] = rotl(_s[3], 45);
+    }
+
+    // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
+    void warmup()
+    {
+        discard(8);
+    }
+
+    /// \endcond
+
+    std::uint64_t _s[4];
+};
+
 
 class xoroshiro128plusshixo
 {
@@ -628,8 +1168,8 @@ public:
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixo, std::uint64_t, value )
     {
         std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-        _s [ 0 ] = splitmix64::hash ( s );
-        _s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
+        _s [ 0 ] = detail::xoroshiro_integer_hash ( s );
+        _s [ 1 ] = detail::xoroshiro_integer_hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
     }
 
     /**
@@ -777,13 +1317,13 @@ private:
     /// \cond show_private
 
     // Rotate left, use of intrinsic shows no speed-up. */
-    static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
+    static std::uint64_t rotl ( const std::uint64_t x, const int k )
     {
         return ( x << k ) | ( x >> ( 64 - k ) );
     }
 
     /** Advance the state by 1 step. */
-    inline void next ( )
+    void next ( )
     {
         _s [ 1 ] ^= _s [ 0 ];
         _s [ 0 ] = rotl ( _s [ 0 ], 55 );
@@ -793,7 +1333,7 @@ private:
     }
 
     // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-    inline void warmup ( )
+    void warmup ( )
     {
         discard ( 8 );
     }
@@ -870,8 +1410,8 @@ public:
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixostar, std::uint64_t, value )
     {
         std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-        _s [ 0 ] = splitmix64::hash ( s );
-        _s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
+        _s [ 0 ] = detail::xoroshiro_integer_hash ( s );
+        _s [ 1 ] = detail::xoroshiro_integer_hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
     }
 
     /**
@@ -1004,13 +1544,13 @@ private:
     /// \cond show_private
 
     // Rotate left, use of intrinsic shows no speed-up. */
-    static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
+    static std::uint64_t rotl ( const std::uint64_t x, const int k )
     {
         return ( x << k ) | ( x >> ( 64 - k ) );
     }
 
     /** Advance the state by 1 step. */
-    inline void next ( )
+    void next ( )
     {
         _s [ 1 ] ^= _s [ 0 ];
         _s [ 0 ] = rotl ( _s [ 0 ], 55 );
@@ -1020,7 +1560,7 @@ private:
     }
 
     // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-    inline void warmup ( )
+    void warmup ( )
     {
         discard ( 8 );
     }
@@ -1098,8 +1638,8 @@ public:
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED ( xoroshiro128plusshixostarshixo, std::uint64_t, value )
     {
         std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-        _s [ 0 ] = splitmix64::hash ( s );
-        _s [ 1 ] = splitmix64::hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
+        _s [ 0 ] = detail::xoroshiro_integer_hash ( s );
+        _s [ 1 ] = detail::xoroshiro_integer_hash ( ( s += std::uint64_t { 0x9E3779B97F4A7C15 } ) );
     }
 
     /**
@@ -1233,13 +1773,13 @@ private:
     /// \cond show_private
 
     // Rotate left, use of intrinsic shows no speed-up. */
-    static inline std::uint64_t rotl ( const std::uint64_t x, const int k )
+    static std::uint64_t rotl ( const std::uint64_t x, const int k )
     {
         return ( x << k ) | ( x >> ( 64 - k ) );
     }
 
     /** Advance the state by 1 step. */
-    inline void next ( )
+    void next ( )
     {
         _s [ 1 ] ^= _s [ 0 ];
         _s [ 0 ] = rotl ( _s [ 0 ], 55 );
@@ -1249,7 +1789,7 @@ private:
     }
 
     // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-    inline void warmup ( )
+    void warmup ( )
     {
         discard ( 8 );
     }
@@ -1334,8 +1874,8 @@ public:
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(xorshift128plus, std::uint64_t, value)
     {
         std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-        _s[0] = splitmix64::hash(s);
-        _s[1] = splitmix64::hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+        _s[0] = detail::xoroshiro_integer_hash(s);
+        _s[1] = detail::xoroshiro_integer_hash((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
     }
 
     /**
@@ -1458,7 +1998,7 @@ private:
     /// \cond show_private
 
     /** Advance the state by 1 step. */
-    inline void next()
+    void next()
     {
         std::uint64_t s1 = _s[0];
         _s[0] = _s[1];
@@ -1467,7 +2007,7 @@ private:
     }
 
     // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-    inline void warmup()
+    void warmup()
     {
         discard(8);
     }
@@ -1554,9 +2094,9 @@ public:
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(xorshift1024star, std::uint64_t, value)
     {
         std::uint64_t s = value + std::uint64_t { 0x9E3779B97F4A7C15 };
-        _s[0] = splitmix64::hash(s);
+        _s[0] = detail::xoroshiro_integer_hash(s);
         for (std::size_t i = 1; i < 16; ++i) {
-            _s[i] = splitmix64::hash ((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
+            _s[i] = detail::xoroshiro_integer_hash ((s += std::uint64_t { 0x9E3779B97F4A7C15 }));
         }
         _p = 0;
     }
@@ -1717,7 +2257,7 @@ private:
     /// \cond show_private
 
     /** Advance the state by 1 step. */
-    inline void next()
+    void next()
     {
         const std::uint64_t s0 = _s[_p];
         std::uint64_t s1 = _s[(_p = (_p + 1) & 15)];
@@ -1726,7 +2266,7 @@ private:
     }
 
     // As per http://www0.cs.ucl.ac.uk/staff/D.Jones/GoodPracticeRNG.pdf
-    inline void warmup()
+    void warmup()
     {
         discard(64);
     }
