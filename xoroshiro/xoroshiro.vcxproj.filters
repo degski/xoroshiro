@@ -50,6 +50,9 @@
     <ClInclude Include="complementary_multiply_with_carry.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="xoroshiro_meon.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

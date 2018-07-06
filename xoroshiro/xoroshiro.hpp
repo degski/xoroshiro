@@ -1221,7 +1221,7 @@ public:
     {
         std::uint64_t r = _s[0] + _s [1];
         next ( );
-        return ( r >> 48 ) ^ r;
+        return ( r >> 32 ) ^ r;
     }
 
     /** Fills a range with random values. */

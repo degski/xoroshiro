@@ -47,7 +47,7 @@ struct GeneratorCache : private Generator {
     template<typename SeedSeq>
     GeneratorCache ( const SeedSeq & seq_ ) : Generator ( seq_ ) { }
     template<typename It>
-    GeneratorCache ( It& first_, It last_ ) : Generator ( first_, last_ ) { }
+    GeneratorCache ( It & first_, It last_ ) : Generator ( first_, last_ ) { }
 
     result_type operator ( ) ( ) noexcept {
 
@@ -82,6 +82,7 @@ int main ( ) {
     GeneratorCache<boost::random::xoshiro256starstar> gen2 ( seq_fe );
     GeneratorCache<boost::random::xoshiro256plus> gen3 ( seq_fe );
     GeneratorCache<boost::random::xoroshiro128plusshixo> gen4 ( seq_fe );
+
     pcg64 gen5 ( seq_fe );
 
     while ( cnt-- ) {

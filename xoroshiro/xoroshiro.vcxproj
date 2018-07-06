@@ -167,6 +167,7 @@
     <ClInclude Include="seed_seq_fe.hpp" />
     <ClInclude Include="taus88.hpp" />
     <ClInclude Include="xoroshiro.hpp" />
+    <ClInclude Include="xoroshiro_meon.hpp" />
     <ClInclude Include="xor_combine.hpp" />
   </ItemGroup>
   <ItemGroup>
