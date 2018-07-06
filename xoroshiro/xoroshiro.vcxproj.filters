@@ -50,7 +50,7 @@
     <ClInclude Include="complementary_multiply_with_carry.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="xoroshiro_meon.hpp">
+    <ClInclude Include="xoroshiro_meo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
