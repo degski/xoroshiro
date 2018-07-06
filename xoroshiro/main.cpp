@@ -19,7 +19,7 @@
 #include "complementary_multiply_with_carry.hpp"
 
 #include <pcg/pcg_random.hpp>
-
+#include "xoroshiro_meo.hpp"
 
 #define PCG_USE_ZEROCHECK_ROTATE_IDIOM 1
 
@@ -78,12 +78,11 @@ int main ( ) {
 
     std::uint64_t cnt = 1;
 
-    GeneratorCache<boost::random::xoroshiro128plus> gen1 ( seq_fe );
-    GeneratorCache<boost::random::xoshiro256starstar> gen2 ( seq_fe );
-    GeneratorCache<boost::random::xoshiro256plus> gen3 ( seq_fe );
-    GeneratorCache<boost::random::xoroshiro128plusshixo> gen4 ( seq_fe );
-
-    pcg64 gen5 ( seq_fe );
+    xoroshiro128plus64 gen1 ( 0xBE1C0467EBA5FAC1 );
+    xoroshiro128plus64 gen2 ( 0xBE2C0467EBA5FAC2 );
+    xoroshiro128plus64 gen3 ( 0xBE3C0467EBA5FAC3 );
+    xoroshiro128plus64 gen4 ( 0xBE4C0467EBA5FAC4 );
+    xoroshiro128plus64 gen5 ( 0xBE5C0467EBA5FAC5 );
 
     while ( cnt-- ) {
 

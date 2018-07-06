@@ -5,7 +5,6 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
   * **cmwc**: C99 Complementary Multiply With Carry generator;
   * **practrand**: build a generator for use with `practrand`;
   * **xoroshiro**: `splitmix64`, `xoroshiro128plus`, `xorshift128plus`, `xorshift1024star`, [`xoshi256starstar`](http://xoshiro.di.unimi.it/xoshiro256starstar.c), [`xoshiro256plus`](http://xoshiro.di.unimi.it/xoshiro256plus.c) and some 'mods' of `xoroshiro128plus`. The most interesting one amongst those 'mods', for lack of better ideas (and to not obfuscate its origins), I've baptised `xoroshiro128plusshixo`, which reflects what it does, it's an ordinary `xoroshiro128plus` with a final mixer added of the form `r = ( r >> 32 ) ^ r`. From my layman's perspective I would describe it as that the higher entropy bits from the middle get mixed-in with the lower entropy low bits, hence quality improves. Testing with `practrand` shows that this generator performs better than the original. It still fails (consistently, with different seeds, reporting `BRank(12):12K(1)` at the 64 gigabyte mark), but it is the fastest;
-* Testing shows that `xoroshiro128plusshixo` is **approximately 8% faster** than `xoroshiro128plus`. This result is possibly only typical for the [x86] hardware it was tested on (Intel Ci-5005U);
 * Testing shows that `xoshiro256starstar` is of very good quality (on par with `pcg64`), but also the **slowest** in the lot (some 17% slower than `pcg64`);
 * All code to verify the above claim is available in this repo;
 * I did not yet make any effort to avoid code duplication, surely this can coded far more cleverly, but for now it's just copy a generator, change some lines and go, wash, rinse, repeat;
@@ -15,13 +14,13 @@ Boost Version of Xoroshiro Pseudo Random Number Generator (WIP)
 
 ## Some test results
 
-### Speedtest (showing relative difference, the absolute number is not relevant) (IT APPEARS I HAVE TO HAVE ANOTHER LOOK AT THIS)
+### Speedtest (showing relative difference, the absolute number is not relevant)
 
     xoshiro256starstar                4550 ms (1.40)
     xoshiro256plus                    4360 ms (1.35)
     pcg64                             3800 ms (1.17)
     xoroshiro128plus                  3500 ms (1.08)
-    xoroshiro128plusshixo             3240 ms (1.00) 
+    xoroshiro128plusshixo             3240 ms (1.00) (is running at same speed as `xoroshiro128plus`, when properly implemented and tested)
 
 The test were conducted on an `Intel Ci3-5005U` cpu, `Windows 10 1803 x64`, built with [`Clang/LLVM-7.0.0-r333363-win64`](https://llvm.org/builds/) (has been updated since), relevant command line parameters `-O3 -ffast-math -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2`.
 

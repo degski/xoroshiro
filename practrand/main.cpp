@@ -25,6 +25,7 @@
 #include "../xoroshiro/taus88.hpp"
 
 #include <pcg/pcg_random.hpp>
+#include "../xoroshiro/xoroshiro_meo.hpp"
 
 #define __AVX2__ 1
 
@@ -36,12 +37,12 @@ auto main ( ) -> int {
     _setmode ( _fileno ( stdout ), _O_BINARY );
     #endif
 
-    using Generator = boost::random::xoroshiro128plusshixo;
+    using Generator = xoroshiro128plus64; // boost::random::xoroshiro128plusshixo;
     // using Generator = pcg64;
     using result_type = typename Generator::result_type;
 
     const boost::random::seed_seq_fe256 seq { 11, 21, 31, 41, 51, 61, 71, 81, 91, 101 };
-    Generator rng(seq);
+    Generator rng( 0xBEAC0467EBA5FACB );
 
     const std::size_t page_size = 524'288, buffer_size = page_size / sizeof(result_type);
     result_type buffer[buffer_size];

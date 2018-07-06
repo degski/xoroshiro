@@ -27,6 +27,7 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-18 Melissa E. O'Neill
+ * Copyright (c) 2018 degski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -117,7 +118,10 @@ public:
 
         base::advance();
 
-        return result >> (base::ITYPE_BITS - base::RTYPE_BITS);
+        // Melissa E. O'Neill:
+        // return result >> ( base::ITYPE_BITS - base::RTYPE_BITS );
+        // degski:
+        return ( ( result >> ( ( base::ITYPE_BITS / 4 ) * 2 ) ) ^ result ) >> ( base::ITYPE_BITS - base::RTYPE_BITS );
     }
 };
 
