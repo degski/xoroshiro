@@ -41,59 +41,51 @@
 #include <string>
 
 
-namespace degski {
+namespace at {
 
-enum timer_precision { years, days, hours, minutes, seconds, milliseconds, microseconds, nanoseconds, picoseconds };
+enum timer_precision : std::size_t { years, days, hours, minutes, seconds, milliseconds, microseconds, nanoseconds, picoseconds };
 static const std::string precision_desc [ 9 ] { " years.\n", " days.\n", " hours.\n", " minutes.\n", " seconds.\n", " milliseconds.\n", " microseconds.\n", " nanoseconds.\n", " picoseconds.\n" };
 
 class AutoTimer {
 
-    const double Cycles; // inverse performance-counter frequency, in counts per second
-
+    double frequency;
     std::string fs;
     timer_precision precision;
 
-    double end;
+    LARGE_INTEGER start, end;
+
     double * total_time = nullptr;
-    double start;
 
-    unsigned int ui;
-
-    inline double WallTime ( ) {
-        return double ( __rdtscp ( &ui ) ) * Cycles;
-    }
-
-    double QueryCycles ( ) {
-        LARGE_INTEGER PerformanceFrequency;
-        QueryPerformanceFrequency ( &PerformanceFrequency );
-        return 1.0 / ( double ( PerformanceFrequency.QuadPart ) * double ( 1024000 / CLOCKS_PER_SEC ) );
+    [[ nodiscard ]] double QueryFrequency ( ) noexcept {
+        LARGE_INTEGER performance_frequency;
+        QueryPerformanceFrequency ( & performance_frequency );
+        return static_cast<double> ( performance_frequency.QuadPart );
     }
 
 public:
 
-    AutoTimer ( timer_precision _p = microseconds, double * total_time_ = nullptr, std::string _fs = " %.0f" ) :
-        Cycles ( QueryCycles ( ) ), fs ( _fs + ( _fs != "" ? precision_desc [ _p ] : "" ) ), precision ( _p ), end ( 0.0 ), total_time ( total_time_ ), start ( WallTime ( ) ) {
+    AutoTimer ( timer_precision _p = microseconds, double * total_time_ = nullptr, std::string _fs = " %.0f" ) noexcept :
+        frequency { QueryFrequency ( ) },
+        fs { _fs + ( _fs != "" ? precision_desc [ _p ] : "" ) },
+        precision { _p },
+        total_time { total_time_ } {
+            QueryPerformanceCounter ( & start );
         }
 
-    ~AutoTimer ( ) {
+    ~AutoTimer ( ) noexcept {
         const double duration = toc ( );
         if ( total_time != nullptr ) {
             *total_time += duration;
         }
-        if ( !fs.empty ( ) ) {
+        if ( not ( fs.empty ( ) ) ) {
             std::printf ( fs.c_str ( ), duration );
         }
     }
 
-    double tic ( ) {
-        start = WallTime ( );
-        return start;
-    }
-
-    double toc ( ) {
-        end = WallTime ( );
+    [[ nodiscard ]] double toc ( ) noexcept {
         static const double r [ ] = { 1.0 / 31557600.0, 1.0 / 86400.0, 1.0 / 3600.0, 1.0 / 60.0, 1.0, 1e3, 1e6, 1e9, 1e12 };
-        return ( end - start ) * r [ precision ];
+        QueryPerformanceCounter ( & end );
+        return ( static_cast<double> ( end.QuadPart - start.QuadPart ) / frequency ) * r [ precision ];
     }
 };
 }
